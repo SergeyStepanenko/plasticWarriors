@@ -4,6 +4,8 @@ import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/css/bootstrap-theme.css';
 import * as B from 'react-bootstrap';
 
+import map_1 from './maps/map_1.jpg';
+
 const config = {
 	apiKey: 'AIzaSyCB1TfuGQegOrHOPcFJFqpxDmMTSElXQVg',
 	authDomain: 'plastic-warriors.firebaseapp.com',
@@ -142,6 +144,11 @@ export default class Map extends PureComponent {
 							</div>
 						))
 					}
+					<B.Image
+						ref={(r) => { this.$image = r; }}
+						src={map_1}
+						responsive
+					/>
 				</B.Col>
 				<B.Col xs={4} md={4}>
 					<B.Form horizontal>

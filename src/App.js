@@ -1,5 +1,8 @@
 import React, { PureComponent } from 'react';
 import * as firebase from 'firebase';
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap/dist/css/bootstrap-theme.css';
+import * as B from 'react-bootstrap';
 
 const config = {
 	apiKey: 'AIzaSyCB1TfuGQegOrHOPcFJFqpxDmMTSElXQVg',
@@ -66,11 +69,27 @@ export default class Map extends PureComponent {
 		});
 	};
 
+	Promise_all = (promises) => {
+		return new Promise((resolve) => {
+			const results = [];
+			let count = 0;
+			promises.forEach((promise, idx) => {
+				promise
+					.catch(err => err)
+					.then(valueOrError => {
+						results[idx] = valueOrError;
+						count += 1;
+						if (count === promises.length) resolve(results);
+					});
+			});
+		});
+	};
+
 	handleFirebaseResponse = async (data) => {
 		const { firebaseData } = this.state;
 		const keys = Object.keys(data);
 		const promises = [ ...keys.map(key => this.requestDataFromKidsTrack(firebaseData[key].url, firebaseData[key].name)) ];
-		const mappedWarriors = await Promise.all(promises);
+		const mappedWarriors = await this.Promise_all(promises);
 
 		this.setState({
 			mappedWarriors
@@ -108,7 +127,19 @@ export default class Map extends PureComponent {
 
 		return(
 			<div>
-				<div>
+				<B.Col xs={8} md={8}>
+					<strong>Данные геопозиции:</strong>
+					{
+						mappedWarriors && mappedWarriors.map(value => (
+							<div key={`${value.lat}_${value.lng}`}>
+								<span>{value.name}  </span>
+								<span>lat: {value.lat}&</span>
+								<span>lng: {value.lng}</span>
+							</div>
+						))
+					}
+				</B.Col>
+				<B.Col xs={4} md={4}>
 					<input
 						placeholder='Имя'
 						onChange={(event) => this.handleChange('name', event)}
@@ -125,29 +156,17 @@ export default class Map extends PureComponent {
 					>
 						Добавить
 					</button>
-				</div>
-				<div>
-					<strong>Данные геопозиции:</strong>
-					{
-						mappedWarriors && mappedWarriors.map(value => (
-							<div key={`${value.lat}_${value.lng}`}>
-								<span>{value.name}  </span>
-								<span>lat: {value.lat}&</span>
-								<span>lng: {value.lng}</span>
-							</div>
-						))
-					}
-				</div>
-				<div>
-					<strong>Пластиковые воины:</strong>
-					{
-						Object.keys(this.state.firebaseData).map((value) => (
-							<div key={value}>
-								<small>{this.state.firebaseData[value].name}</small>
-							</div>
-						))
-					}
-				</div>
+					<div>
+						<strong>Пластиковые воины:</strong>
+						{
+							Object.keys(this.state.firebaseData).map((value) => (
+								<div key={value}>
+									<small>{this.state.firebaseData[value].name}</small>
+								</div>
+							))
+						}
+					</div>
+				</B.Col>
 			</div>
 		);
 	}

@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap-theme.css';
 import * as B from 'react-bootstrap';
 
 import mapImg from './maps/map_1.jpg';
-import mapKML from './maps/map.kml';
+// import mapKML from './maps/map.kml';
 
 const config = {
 	apiKey: 'AIzaSyCB1TfuGQegOrHOPcFJFqpxDmMTSElXQVg',
@@ -142,7 +142,7 @@ export default class App extends PureComponent {
 	paintWarriorsOnMap = (params, warriors) => {
 		console.log({
 			params,
-			warriors
+			warriors,
 		});
 	}
 

@@ -24,6 +24,7 @@ export default class Map extends PureComponent {
 		form: {
 			name: '',
 			url: '',
+			color: 'red'
 		},
 		mappedWarriors: [],
 		firebaseData: {},
@@ -48,7 +49,7 @@ export default class Map extends PureComponent {
 		});
 	}
 
-	requestDataFromKidsTrack = (url, assignedName) => {
+	requestDataFromKidsTrack = (url, assignedName, key) => {
 		return new Promise((resolve, reject) => {
 			const xhr = new XMLHttpRequest();
 			xhr.open('GET', `${CORS}${url}&mode=poll`, true);
@@ -56,7 +57,8 @@ export default class Map extends PureComponent {
 				if (this.status === 200) {
 					resolve({
 						...JSON.parse(this.response),
-						name: assignedName
+						name: assignedName,
+						key
 					});
 				} else {
 					const error = new Error(this.statusText);
@@ -88,7 +90,7 @@ export default class Map extends PureComponent {
 	handleFirebaseResponse = async (data) => {
 		const { firebaseData } = this.state;
 		const keys = Object.keys(data);
-		const promises = [ ...keys.map(key => this.requestDataFromKidsTrack(firebaseData[key].url, firebaseData[key].name)) ];
+		const promises = [ ...keys.map(key => this.requestDataFromKidsTrack(firebaseData[key].url, firebaseData[key].name, key)) ];
 		const mappedWarriors = await this.Promise_all(promises);
 
 		this.setState({
@@ -110,20 +112,22 @@ export default class Map extends PureComponent {
 
 	handleSubmit = () => {
 		this.sendDataToFirebase({
-			name: this.state.form.name,
-			url: this.state.form.url,
+			name: this.state.form.name.trim(),
+			url: this.state.form.url.trim(),
+			color: this.state.form.color,
 		});
 
 		this.setState({
 			form: {
 				name: '',
-				url: ''
+				url: '',
+				color: 'red'
 			}
 		});
 	}
 
 	render() {
-		const { mappedWarriors } = this.state;
+		const { mappedWarriors, firebaseData, form } = this.state;
 
 		return(
 			<div>
@@ -140,32 +144,75 @@ export default class Map extends PureComponent {
 					}
 				</B.Col>
 				<B.Col xs={4} md={4}>
-					<input
-						placeholder='Имя'
-						onChange={(event) => this.handleChange('name', event)}
-						value={this.state.form.name}
-					/>
-					<input
-						placeholder='Ссылка из trackKids'
-						onChange={(event) => this.handleChange('url', event)}
-						value={this.state.form.url}
-					/>
-					<button
-						onClick={this.handleSubmit}
-						disabled={this.state.name === '' || this.state.url === ''}
-					>
-						Добавить
-					</button>
-					<div>
-						<strong>Пластиковые воины:</strong>
-						{
-							Object.keys(this.state.firebaseData).map((value) => (
-								<div key={value}>
-									<small>{this.state.firebaseData[value].name}</small>
-								</div>
-							))
-						}
-					</div>
+					<B.Form horizontal>
+						<B.Panel header={'Пластиковые воины:'} bsStyle="primary">
+							<B.FormGroup controlId="formHorizontalEmail">
+								<B.Col sm={12}>
+									<B.ControlLabel>Имя воина</B.ControlLabel>
+									<B.FormControl
+										type="text"
+										placeholder='Введите имя воина'
+										onChange={(event) => this.handleChange('name', event)}
+										value={this.state.form.name}
+									/>
+								</B.Col>
+							</B.FormGroup>
+
+							<B.FormGroup controlId="formHorizontalPassword">
+								<B.Col sm={12}>
+									<B.ControlLabel>Ссылка из trackKids</B.ControlLabel>
+									<B.FormControl
+										type="text"
+										placeholder='Введите ссылку'
+										onChange={(event) => this.handleChange('url', event)}
+										value={this.state.form.url}
+									/>
+								</B.Col>
+							</B.FormGroup>
+
+							<B.FormGroup>
+								<B.Col sm={12}>
+									<B.ControlLabel>Цвет метки на карте</B.ControlLabel>
+									<B.FormControl componentClass="select" onChange={(event) => this.handleChange('color', event)}>
+										<option value="red">красный</option>
+										<option value="green">зеленый</option>
+										<option value="yellow">желтый</option>
+									</B.FormControl>
+								</B.Col>
+							</B.FormGroup>
+
+							<B.FormGroup>
+								<B.Col sm={12}>
+									<B.Button
+										type="submit"
+										onClick={this.handleSubmit}
+										disabled={form.name === '' || form.url === ''}
+									>
+										Добавить
+									</B.Button>
+								</B.Col>
+							</B.FormGroup>
+						</B.Panel>
+					</B.Form>
+					<B.Panel header={'Пластиковые воины:'} bsStyle="primary">
+						<B.FormGroup>
+							{
+								Object.keys(firebaseData).map((key) => (
+									<B.Row key={key}>
+										<B.Col sm={4}>
+											<small>{firebaseData[key].name}</small>
+										</B.Col>
+										<B.Col sm={2}>
+											<small>{firebaseData[key].color || 'color'}</small>
+										</B.Col>
+										<B.Col sm={2}>
+											<small>{firebaseData[key].status || 'isOnline'}</small>
+										</B.Col>
+									</B.Row>
+								))
+							}
+						</B.FormGroup>
+					</B.Panel>
 				</B.Col>
 			</div>
 		);

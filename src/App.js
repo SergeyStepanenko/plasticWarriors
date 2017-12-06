@@ -36,7 +36,9 @@ export default class App extends PureComponent {
 			south: 55.6537422837442,
 			east: 37.6337206363678,
 			west: 37.6171284914017,
-		}
+		},
+		x: 0,
+		y: 0,
 	}
 
 	componentDidMount() {
@@ -139,10 +141,20 @@ export default class App extends PureComponent {
 		});
 	}
 
-	paintWarriorsOnMap = (params, warriors) => {
+	paintWarriorsOnMap = (imgData, warriors) => {
 		console.log({
-			params,
+			imgData,
 			warriors,
+		});
+
+		const { geoData } = this.state;
+		const lat = 55.65721;
+		const lng = 37.62606;
+		const Xscale = imgData.width / (geoData.east - geoData.west); // количество пикселей в одном градусе долготы (3093/0,0166=186325)
+		const Yscale = imgData.height / (geoData.north - geoData.south);  // количество пикселей в одном градусе широты (3093/0,00938=329744)
+		this.setState({
+			x: (lng - geoData.west) * Xscale,  // переменная может принимать отрицательное значение
+			y: (geoData.north - lat) * Yscale //  переменная может принимать отрицательное значение
 		});
 	}
 
@@ -157,6 +169,14 @@ export default class App extends PureComponent {
 
 	render() {
 		const { mappedWarriors, firebaseData, form } = this.state;
+		const style = {
+			position: 'relative',
+			backgroundColor: 'red',
+			width: '20px',
+			height: '20px',
+			left: `${this.state.x}px`,
+			top: `${this.state.y}px`,
+		};
 
 		return(
 			<div>
@@ -167,14 +187,7 @@ export default class App extends PureComponent {
 							responsive
 						/>
 					</div>
-					<div style={{
-						position: 'relative',
-						backgroundColor: 'red',
-						width: '20px',
-						height: '20px',
-						top: '0',
-						left: '0',
-					}}/>
+					<div style={style}/>
 				</B.Col>
 				<B.Col xs={4} md={4}>
 					<B.Form horizontal>

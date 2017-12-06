@@ -4,7 +4,8 @@ import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/css/bootstrap-theme.css';
 import * as B from 'react-bootstrap';
 
-import map_1 from './maps/map_1.jpg';
+import mapImg from './maps/map_1.jpg';
+import mapKML from './maps/map.kml';
 
 const config = {
 	apiKey: 'AIzaSyCB1TfuGQegOrHOPcFJFqpxDmMTSElXQVg',
@@ -30,6 +31,12 @@ export default class App extends PureComponent {
 		},
 		mappedWarriors: [],
 		firebaseData: {},
+		geoData: {
+			north: 55.6631224066095,
+			south: 55.6537422837442,
+			east: 37.6337206363678,
+			west: 37.6171284914017,
+		}
 	}
 
 	componentDidMount() {
@@ -37,9 +44,7 @@ export default class App extends PureComponent {
 			this.setState({
 				firebaseData: snap.val()
 			}, () => {
-				this.handleFirebaseResponse(this.state.firebaseData).then(mappedWarriors => {
-					this.setState({ mappedWarriors });
-				});
+				this.requestKidsTrackData(this.state.firebaseData);
 			});
 		});
 	}
@@ -51,9 +56,10 @@ export default class App extends PureComponent {
 		});
 	}
 
-	requestDataFromKidsTrack = (url, assignedName, key) => {
+	requestData = (url, assignedName, key) => {
 		return new Promise((resolve, reject) => {
 			const xhr = new XMLHttpRequest();
+
 			xhr.open('GET', `${CORS}${url}&mode=poll`, true);
 			xhr.onload = function x() {
 				if (this.status === 200) {
@@ -72,6 +78,7 @@ export default class App extends PureComponent {
 					});
 				}
 			};
+
 			xhr.send();
 			xhr.onerror = () => reject(new Error('oops'));
 		});
@@ -93,20 +100,20 @@ export default class App extends PureComponent {
 		});
 	};
 
-	handleFirebaseResponse = async (data) => {
-		const { firebaseData } = this.state;
+	requestKidsTrackData = async (data) => {
 		const keys = Object.keys(data);
-		const promises = [ ...keys.map(key => this.requestDataFromKidsTrack(firebaseData[key].url, firebaseData[key].name, key)) ];
+		const promises = [ ...keys.map(key => this.requestData(data[key].url, data[key].name, key)) ];
 		const mappedWarriors = await this.Promise_all(promises);
 
 		this.setState({
-			mappedWarriors
+			mappedWarriors,
+			keys
+		}, () => {
+			return Promise.resolve(mappedWarriors);
 		});
-
-		return Promise.resolve(mappedWarriors);
 	};
 
-	handleChange = (form, event) => {
+	handleFormChange = (form, event) => {
 		event.preventDefault();
 		this.setState({
 			form: {
@@ -132,8 +139,20 @@ export default class App extends PureComponent {
 		});
 	}
 
+	paintWarriorsOnMap = (params, warriors) => {
+		console.log({
+			params,
+			warriors
+		});
+	}
+
 	handleMapRefresh = () => {
-		console.log(this.$image.getBoundingClientRect());
+		this.setState({
+			imgParams: this.$image.getBoundingClientRect()
+		}, async () => {
+			// await this.requestKidsTrackData(this.state.firebaseData);
+			this.paintWarriorsOnMap(this.state.imgParams, this.state.mappedWarriors);
+		});
 	}
 
 	render() {
@@ -142,13 +161,20 @@ export default class App extends PureComponent {
 		return(
 			<div>
 				<B.Col xs={8} md={8}>
-					<div ref={(r) => { this.$image = r; }}>
+					<div style={{ position: 'absolute' }} ref={(r) => { this.$image = r; }}>
 						<B.Image
-							src={map_1}
+							src={mapImg}
 							responsive
 						/>
 					</div>
-					<B.Button onClick={this.handleMapRefresh}>Обновить карту</B.Button>
+					<div style={{
+						position: 'relative',
+						backgroundColor: 'red',
+						width: '20px',
+						height: '20px',
+						top: '0',
+						left: '0',
+					}}/>
 				</B.Col>
 				<B.Col xs={4} md={4}>
 					<B.Form horizontal>
@@ -159,7 +185,7 @@ export default class App extends PureComponent {
 									<B.FormControl
 										type="text"
 										placeholder='Введите имя воина'
-										onChange={(event) => this.handleChange('name', event)}
+										onChange={(event) => this.handleFormChange('name', event)}
 										value={this.state.form.name}
 									/>
 								</B.Col>
@@ -171,7 +197,7 @@ export default class App extends PureComponent {
 									<B.FormControl
 										type="text"
 										placeholder='Введите ссылку'
-										onChange={(event) => this.handleChange('url', event)}
+										onChange={(event) => this.handleFormChange('url', event)}
 										value={this.state.form.url}
 									/>
 								</B.Col>
@@ -180,7 +206,7 @@ export default class App extends PureComponent {
 							<B.FormGroup>
 								<B.Col sm={12}>
 									<B.ControlLabel>Цвет метки на карте</B.ControlLabel>
-									<B.FormControl componentClass="select" onChange={(event) => this.handleChange('color', event)}>
+									<B.FormControl componentClass="select" onChange={(event) => this.handleFormChange('color', event)}>
 										<option value="red">красный</option>
 										<option value="green">зеленый</option>
 										<option value="yellow">желтый</option>
@@ -223,13 +249,14 @@ export default class App extends PureComponent {
 									!warrior.error &&
 										<B.Row key={warrior.lat+warrior.lng + warrior.battery_lvl}>
 											<B.Col sm={4}>{warrior.name}</B.Col>
-											<B.Col sm={4}>lat: {warrior.lat}&</B.Col>
+											<B.Col sm={4}>lat: {warrior.lat}</B.Col>
 											<B.Col sm={4}>lng: {warrior.lng}</B.Col>
 										</B.Row>
 								))
 							}
 						</B.FormGroup>
 					</B.Panel>
+					<B.Button onClick={this.handleMapRefresh}>Обновить карту</B.Button>
 				</B.Col>
 			</div>
 		);

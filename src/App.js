@@ -21,7 +21,7 @@ const CORS = 'https://cors-anywhere.herokuapp.com/';
 const database = firebase.database();
 const rootRef = database.ref('/');
 
-export default class Map extends PureComponent {
+export default class App extends PureComponent {
 	state = {
 		form: {
 			name: '',
@@ -65,7 +65,11 @@ export default class Map extends PureComponent {
 				} else {
 					const error = new Error(this.statusText);
 					error.code = this.status;
-					reject(error);
+					reject({
+						name: assignedName,
+						key,
+						error
+					});
 				}
 			};
 			xhr.send();
@@ -128,27 +132,23 @@ export default class Map extends PureComponent {
 		});
 	}
 
+	handleMapRefresh = () => {
+		console.log(this.$image.getBoundingClientRect());
+	}
+
 	render() {
 		const { mappedWarriors, firebaseData, form } = this.state;
 
 		return(
 			<div>
 				<B.Col xs={8} md={8}>
-					<strong>Данные геопозиции:</strong>
-					{
-						mappedWarriors && mappedWarriors.map(value => (
-							<div key={`${value.lat}_${value.lng}`}>
-								<span>{value.name}  </span>
-								<span>lat: {value.lat}&</span>
-								<span>lng: {value.lng}</span>
-							</div>
-						))
-					}
-					<B.Image
-						ref={(r) => { this.$image = r; }}
-						src={map_1}
-						responsive
-					/>
+					<div ref={(r) => { this.$image = r; }}>
+						<B.Image
+							src={map_1}
+							responsive
+						/>
+					</div>
+					<B.Button onClick={this.handleMapRefresh}>Обновить карту</B.Button>
 				</B.Col>
 				<B.Col xs={4} md={4}>
 					<B.Form horizontal>
@@ -204,18 +204,28 @@ export default class Map extends PureComponent {
 					<B.Panel header={'Пластиковые воины:'} bsStyle="primary">
 						<B.FormGroup>
 							{
-								Object.keys(firebaseData).map((key) => (
-									<B.Row key={key}>
-										<B.Col sm={4}>
-											<small>{firebaseData[key].name}</small>
-										</B.Col>
-										<B.Col sm={2}>
-											<small>{firebaseData[key].color || 'color'}</small>
-										</B.Col>
-										<B.Col sm={2}>
-											<small>{firebaseData[key].status || 'isOnline'}</small>
-										</B.Col>
-									</B.Row>
+								Object.keys(firebaseData).map((key) => {
+									return(
+										<B.Row key={key}>
+											<B.Col sm={3}>{firebaseData[key].name}</B.Col>
+											<B.Col sm={2}>{firebaseData[key].color || 'color'}</B.Col>
+											<B.Col sm={2}>{firebaseData[key].status || 'isOnline'}</B.Col>
+										</B.Row>
+									);
+								})
+							}
+						</B.FormGroup>
+					</B.Panel>
+					<B.Panel header={'Данные геопозиции:'} bsStyle="primary">
+						<B.FormGroup>
+							{
+								mappedWarriors && mappedWarriors.map(warrior => (
+									!warrior.error &&
+										<B.Row key={warrior.lat+warrior.lng + warrior.battery_lvl}>
+											<B.Col sm={4}>{warrior.name}</B.Col>
+											<B.Col sm={4}>lat: {warrior.lat}&</B.Col>
+											<B.Col sm={4}>lng: {warrior.lng}</B.Col>
+										</B.Row>
 								))
 							}
 						</B.FormGroup>

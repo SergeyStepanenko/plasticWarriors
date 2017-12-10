@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/css/bootstrap-theme.css';
 import * as B from 'react-bootstrap';
 
+import { requestData, Promise_all } from './helpers';
 import mapImg from './maps/map_1.jpg';
 import {
 	Modal,
@@ -32,6 +33,8 @@ export default class App extends PureComponent {
 			name: '',
 			url: '',
 			color: '',
+			key: null,
+			type: 'add',
 		},
 		firebaseData: {},
 		mappedWarriors: [],
@@ -43,7 +46,9 @@ export default class App extends PureComponent {
 		},
 		positionedWarriors: [],
 		isTrackingDataLoading: true,
-		modal: {},
+		modal: {
+			type: '',
+		},
 	}
 
 	componentDidMount() {
@@ -70,6 +75,29 @@ export default class App extends PureComponent {
 		window.removeEventListener('resize', this.handleWindowsResize);
 	}
 
+	handleSubmit = (key) => {
+		this.sendDataToFirebase({
+			key,
+			name: this.state.form.name.trim(),
+			url: this.state.form.url.trim(),
+			color: this.state.form.color,
+		});
+
+		this.resetForm();
+	}
+
+	resetForm = () => {
+		this.setState({
+			form: {
+				name: '',
+				url: '',
+				color: '',
+				key: null,
+				type: 'add',
+			},
+		});
+	}
+
 	handleWindowsResize = () => {
 		const imgParams = this.$image.getBoundingClientRect();
 		this.paintWarriorsOnMap({ imgData: imgParams, warriors: this.state.mappedWarriors });
@@ -79,68 +107,34 @@ export default class App extends PureComponent {
 		});
 	}
 
-	sendDataToFirebase = (warrior) => {
-		firebase.database().ref('/').push().set({
-			name: warrior.name,
-			url: warrior.url
-		});
+	sendDataToFirebase = ({ key, name, url, color }) => {
+		const postData = {
+			name,
+			url,
+			color,
+		};
+
+		if (!key) {
+			firebase.database().ref('/').push().set(postData);
+		} else {
+			const updates = {};
+			updates[key] = postData;
+
+			firebase.database().ref().update(updates);
+		}
+
 	}
 
 	deleteDataFromFirebase = (key) => {
 		firebase.database().ref(`/${key}`).remove();
 	}
 
-	requestData = ({ url, ...rest }) => {
-		return new Promise((resolve, reject) => {
-			const xhr = new XMLHttpRequest();
-			const wrappedUrl = `${CORS}${url}&mode=poll`;
-
-			xhr.open('GET', wrappedUrl, true);
-			xhr.onload = function x() {
-				if (this.status === 200) {
-					resolve({
-						...JSON.parse(this.response).payload[0].data,
-						...rest,
-						url,
-					});
-				} else {
-					const error = new Error(this.statusText);
-					error.code = this.status;
-					reject({
-						...rest,
-						url,
-						error
-					});
-				}
-			};
-
-			xhr.send();
-			xhr.onerror = () => reject(new Error('oops'));
-		});
-	};
-
-	Promise_all = (promises) => {
-		return new Promise((resolve) => {
-			const results = [];
-			let count = 0;
-			promises.forEach((promise, idx) => {
-				promise
-					.catch(err => err)
-					.then(valueOrError => {
-						results[idx] = valueOrError;
-						count += 1;
-						if (count === promises.length) resolve(results);
-					});
-			});
-		});
-	};
-
 	requestKidsTrackData = async (firebaseData) => {
 		const keys = Object.keys(firebaseData);
 		const promises = [
-			...keys.map(key => this.requestData({ ...firebaseData[key] }))
+			...keys.map(key => requestData({ CORS, ...firebaseData[key] }))
 		];
-		const mappedWarriors = await this.Promise_all(promises);
+		const mappedWarriors = await Promise_all(promises);
 
 		this.setState({
 			mappedWarriors,
@@ -168,22 +162,6 @@ export default class App extends PureComponent {
 			}
 		});
 	};
-
-	handleSubmit = () => {
-		this.sendDataToFirebase({
-			name: this.state.form.name.trim(),
-			url: this.state.form.url.trim(),
-			color: this.state.form.color,
-		});
-
-		this.setState({
-			form: {
-				name: '',
-				url: '',
-				color: ''
-			}
-		});
-	}
 
 	paintWarriorsOnMap = ({ imgData, warriors }) => {
 		const { geoData } = this.state;
@@ -214,9 +192,15 @@ export default class App extends PureComponent {
 		});
 	}
 
-	editWarrior = (key) => {
+	editWarrior = ({ firebaseData, key }) => {
 		this.setState({
-			show: true,
+			form: {
+				name: firebaseData[key].name,
+				url: firebaseData[key].url,
+				color: firebaseData[key].color,
+				key,
+				type: 'edit',
+			},
 		});
 	}
 
@@ -224,6 +208,7 @@ export default class App extends PureComponent {
 		this.setState({
 			modal: {
 				...this.state.modal,
+				type: 'delete',
 				show: true,
 				key,
 				action: this.deleteDataFromFirebase,
@@ -312,6 +297,7 @@ export default class App extends PureComponent {
 						handleFormChange={this.handleFormChange}
 						handleSubmit={this.handleSubmit}
 						handleColorPick={this.handleColorPick}
+						handleFormReset={this.resetForm}
 					/>
 					<B.Panel header={'Пластиковые воины:'} bsStyle="primary">
 						<B.FormGroup>
@@ -328,7 +314,7 @@ export default class App extends PureComponent {
 												/>
 											</B.Col>
 											<B.Col sm={3}>
-												<B.Button onClick={() => this.editWarrior(key)}>
+												<B.Button onClick={() => this.editWarrior({ firebaseData, key })}>
 													Изменить
 												</B.Button>
 											</B.Col>

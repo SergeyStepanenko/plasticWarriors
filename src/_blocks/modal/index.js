@@ -13,17 +13,20 @@ export default class Modal extends PureComponent {
 		this.props.onHide();
 	}
 
-	render = () =>
-		<B.Modal {...this.props} bsSize="small" aria-labelledby="contained-modal-title-sm">
-			<B.Modal.Header closeButton>
-				<B.Modal.Title>Удаление воина</B.Modal.Title>
-			</B.Modal.Header>
-			<B.Modal.Body>
-				<h4>Вы действительно хотите удалить воина</h4>
-			</B.Modal.Body>
-			<B.Modal.Footer>
-				<B.Button onClick={this.props.onHide}>Нет</B.Button>
-				<B.Button onClick={this.handleAction}>Да</B.Button>
-			</B.Modal.Footer>
-		</B.Modal>
+	render() {
+		return (
+			<B.Modal {...this.props} bsSize="small" aria-labelledby="contained-modal-title-sm">
+				<B.Modal.Header closeButton>
+					<B.Modal.Title>Удаление воина</B.Modal.Title>
+				</B.Modal.Header>
+				<B.Modal.Body>
+					<h4>Вы действительно хотите удалить воина</h4>
+				</B.Modal.Body>
+				<B.Modal.Footer>
+					<B.Button onClick={this.props.onHide}>Нет</B.Button>
+					<B.Button onClick={this.handleAction}>Да</B.Button>
+				</B.Modal.Footer>
+			</B.Modal>
+		);
+	}
 }

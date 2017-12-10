@@ -29,16 +29,15 @@ export default class App extends PureComponent {
 			url: '',
 			color: 'red'
 		},
-		mappedWarriors: [],
 		firebaseData: {},
+		mappedWarriors: [],
 		geoData: {
 			north: 55.6631224066095,
 			south: 55.6537422837442,
 			east: 37.6337206363678,
 			west: 37.6171284914017,
 		},
-		x: 0,
-		y: 0,
+		positionedWarriors: [],
 	}
 
 	componentDidMount() {
@@ -58,7 +57,7 @@ export default class App extends PureComponent {
 		});
 	}
 
-	requestData = (url, assignedName, key) => {
+	requestData = ({ url, name, key, ...rest }) => {
 		return new Promise((resolve, reject) => {
 			const xhr = new XMLHttpRequest();
 
@@ -67,14 +66,16 @@ export default class App extends PureComponent {
 				if (this.status === 200) {
 					resolve({
 						...JSON.parse(this.response),
-						name: assignedName,
+						...rest,
+						name,
 						key
 					});
 				} else {
 					const error = new Error(this.statusText);
 					error.code = this.status;
 					reject({
-						name: assignedName,
+						...rest,
+						name,
 						key,
 						error
 					});
@@ -102,9 +103,12 @@ export default class App extends PureComponent {
 		});
 	};
 
-	requestKidsTrackData = async (data) => {
-		const keys = Object.keys(data);
-		const promises = [ ...keys.map(key => this.requestData(data[key].url, data[key].name, key)) ];
+	requestKidsTrackData = async (firebaseData) => {
+		const keys = Object.keys(firebaseData);
+		const promises = [
+			...keys.map(key =>
+			this.requestData({ url: firebaseData[key].url, name: firebaseData[key].name, key: key, ...firebaseData[key] }))
+		];
 		const mappedWarriors = await this.Promise_all(promises);
 
 		this.setState({
@@ -142,41 +146,39 @@ export default class App extends PureComponent {
 	}
 
 	paintWarriorsOnMap = (imgData, warriors) => {
-		console.log({
-			imgData,
-			warriors,
-		});
-
 		const { geoData } = this.state;
-		const lat = 55.65721;
-		const lng = 37.62606;
 		const Xscale = imgData.width / (geoData.east - geoData.west); // количество пикселей в одном градусе долготы (3093/0,0166=186325)
 		const Yscale = imgData.height / (geoData.north - geoData.south);  // количество пикселей в одном градусе широты (3093/0,00938=329744)
+
+		const positionedWarriors = warriors.map((warrior) => {
+			return {
+				...warrior,
+				lngInPx: (warrior.lng - geoData.west) * Xscale,
+				ltdInPx: (geoData.north - warrior.lat) * Yscale,
+			};
+		});
+
 		this.setState({
-			x: (lng - geoData.west) * Xscale,  // переменная может принимать отрицательное значение
-			y: (geoData.north - lat) * Yscale //  переменная может принимать отрицательное значение
+			positionedWarriors,
 		});
 	}
 
 	handleMapRefresh = () => {
 		this.setState({
-			imgParams: this.$image.getBoundingClientRect()
+			imgParams: this.$image.getBoundingClientRect(),
 		}, async () => {
-			// await this.requestKidsTrackData(this.state.firebaseData);
+			await this.requestKidsTrackData(this.state.firebaseData);
 			this.paintWarriorsOnMap(this.state.imgParams, this.state.mappedWarriors);
 		});
 	}
 
 	render() {
-		const { mappedWarriors, firebaseData, form } = this.state;
-		const style = {
-			position: 'relative',
-			backgroundColor: 'red',
-			width: '20px',
-			height: '20px',
-			left: `${this.state.x}px`,
-			top: `${this.state.y}px`,
-		};
+		const {
+			mappedWarriors,
+			firebaseData,
+			form,
+			positionedWarriors,
+		} = this.state;
 
 		return(
 			<div>
@@ -187,7 +189,21 @@ export default class App extends PureComponent {
 							responsive
 						/>
 					</div>
-					<div style={style}/>
+					{
+						positionedWarriors.map((warrior) => {
+							const style = {
+								position: 'relative',
+								backgroundColor: warrior.color,
+								width: '10px',
+								height: '10px',
+								transform: `translate(${warrior.lngInPx}px, ${warrior.ltdInPx}px)`,
+							};
+
+							return (
+								<div key={`${warrior.name} ${warrior.key}`} style={style}/>
+							);
+						})
+					}
 				</B.Col>
 				<B.Col xs={4} md={4}>
 					<B.Form horizontal>
@@ -260,7 +276,7 @@ export default class App extends PureComponent {
 							{
 								mappedWarriors && mappedWarriors.map(warrior => (
 									!warrior.error &&
-										<B.Row key={warrior.lat+warrior.lng + warrior.battery_lvl}>
+										<B.Row key={warrior.lat + warrior.lng + warrior.battery_lvl}>
 											<B.Col sm={4}>{warrior.name}</B.Col>
 											<B.Col sm={4}>lat: {warrior.lat}</B.Col>
 											<B.Col sm={4}>lng: {warrior.lng}</B.Col>

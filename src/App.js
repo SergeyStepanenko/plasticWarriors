@@ -1,12 +1,15 @@
 import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
 import * as firebase from 'firebase';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/css/bootstrap-theme.css';
 import * as B from 'react-bootstrap';
-import { CirclePicker } from 'react-color';
 
 import mapImg from './maps/map_1.jpg';
+import {
+	Modal,
+	WarriorForm,
+	PinSVG,
+} from './_blocks';
 
 const config = {
 	apiKey: 'AIzaSyCB1TfuGQegOrHOPcFJFqpxDmMTSElXQVg',
@@ -40,6 +43,7 @@ export default class App extends PureComponent {
 		},
 		positionedWarriors: [],
 		isTrackingDataLoading: true,
+		modal: {},
 	}
 
 	componentDidMount() {
@@ -80,6 +84,10 @@ export default class App extends PureComponent {
 			name: warrior.name,
 			url: warrior.url
 		});
+	}
+
+	deleteDataFromFirebase = (key) => {
+		firebase.database().ref(`/${key}`).remove();
 	}
 
 	requestData = ({ url, ...rest }) => {
@@ -142,12 +150,12 @@ export default class App extends PureComponent {
 		});
 	};
 
-	handleFormChange = (form, event) => {
+	handleFormChange = (field, event) => {
 		event.preventDefault();
 		this.setState({
 			form: {
 				...this.state.form,
-				[form]: event.target.value
+				[field]: event.target.value
 			}
 		});
 	}
@@ -206,6 +214,31 @@ export default class App extends PureComponent {
 		});
 	}
 
+	editWarrior = (key) => {
+		this.setState({
+			show: true,
+		});
+	}
+
+	deleteWarrior = (key) => {
+		this.setState({
+			modal: {
+				...this.state.modal,
+				show: true,
+				key,
+				action: this.deleteDataFromFirebase,
+			}
+		});
+	}
+
+	modalHide = () => {
+		this.setState({
+			modal: {
+				show: false,
+			}
+		});
+	}
+
 	render() {
 		const {
 			mappedWarriors,
@@ -213,15 +246,23 @@ export default class App extends PureComponent {
 			form,
 			positionedWarriors,
 			isTrackingDataLoading,
+			modal,
 			// isFirebaseDataLoading,
 		} = this.state;
 
-		const isFormCompleted = !!~Object.values(form).indexOf('');
 
 		return (
 			<div>
+				<Modal
+					config={modal}
+					show={modal.show}
+					onHide={this.modalHide}
+				/>
 				<B.Col xs={8} md={8}>
-					<div style={{ position: 'absolute' }} ref={(r) => { this.$image = r; }}>
+					<div
+						style={{ position: 'absolute' }}
+						ref={(r) => { this.$image = r; }}
+					>
 						<B.Image
 							src={mapImg}
 							responsive
@@ -232,26 +273,31 @@ export default class App extends PureComponent {
 							const iconWidth = 15;
 							const iconHeight = 15;
 							const shiftOnMap = `translate(${warrior.lngInPx - iconWidth / 2}px, ${warrior.ltdInPx - iconHeight / 2}px)`;
-							const style = {
+							const pinStyles = {
 								position: 'relative',
 								width: `${iconWidth}px`,
 								height: `${iconHeight}px`,
 								transform: shiftOnMap,
 							};
 
+							const tooltipStyles = {
+								display: 'flex',
+								flexFlow: 'column',
+							};
+
 							const tooltip = (
-								<B.Tooltip id="tooltip">
-									<p>{`Имя: ${warrior.name}`}</p>
-									<p>{`Уровень заряда: ${warrior.batteryLvl}`}</p>
-									<p>{`Acc: ${warrior.acc}`}</p>
-									<p>{`Sleep: ${warrior.sleep}`}</p>
+								<B.Tooltip id="tooltip" style={tooltipStyles}>
+									<div>{`Имя: ${warrior.name}`}</div>
+									<div>{`Уровень заряда: ${warrior.batteryLvl}`}</div>
+									<div>{`Acc: ${warrior.acc}`}</div>
+									<div>{`Sleep: ${warrior.sleep}`}</div>
 								</B.Tooltip>
 							);
 
 							return (
 								<div key={`${warrior.name} ${warrior.key}`}>
 									<B.OverlayTrigger id={warrior.key} overlay={tooltip}>
-										<div style={style}>
+										<div style={pinStyles}>
 											<PinSVG color={warrior.color} />
 										</div>
 									</B.OverlayTrigger>
@@ -261,55 +307,12 @@ export default class App extends PureComponent {
 					}
 				</B.Col>
 				<B.Col xs={4} md={4}>
-					<B.Form horizontal>
-						<B.Panel header={'Пластиковые воины:'} bsStyle="primary">
-							<B.FormGroup controlId="formHorizontalEmail">
-								<B.Col sm={12}>
-									<B.ControlLabel>Имя воина</B.ControlLabel>
-									<B.FormControl
-										type="text"
-										placeholder='Введите имя воина'
-										onChange={(event) => this.handleFormChange('name', event)}
-										value={this.state.form.name}
-									/>
-								</B.Col>
-							</B.FormGroup>
-
-							<B.FormGroup controlId="formHorizontalPassword">
-								<B.Col sm={12}>
-									<B.ControlLabel>Ссылка из trackKids</B.ControlLabel>
-									<B.FormControl
-										type="text"
-										placeholder='Введите ссылку'
-										onChange={(event) => this.handleFormChange('url', event)}
-										value={this.state.form.url}
-									/>
-								</B.Col>
-							</B.FormGroup>
-
-							<B.FormGroup>
-								<B.Col sm={12}>
-									<B.ControlLabel style={{ marginBottom: '10px' }}>Цвет метки на карте</B.ControlLabel>
-									<CirclePicker
-										onChangeComplete={this.handleColorPick}
-										color={this.state.form.color}
-									/>
-								</B.Col>
-							</B.FormGroup>
-
-							<B.FormGroup>
-								<B.Col sm={12}>
-									<B.Button
-										type="submit"
-										onClick={this.handleSubmit}
-										disabled={isFormCompleted}
-									>
-										Добавить
-									</B.Button>
-								</B.Col>
-							</B.FormGroup>
-						</B.Panel>
-					</B.Form>
+					<WarriorForm
+						form={form}
+						handleFormChange={this.handleFormChange}
+						handleSubmit={this.handleSubmit}
+						handleColorPick={this.handleColorPick}
+					/>
 					<B.Panel header={'Пластиковые воины:'} bsStyle="primary">
 						<B.FormGroup>
 							{
@@ -317,14 +320,23 @@ export default class App extends PureComponent {
 									return(
 										<B.Row key={key}>
 											<B.Col sm={3}>{firebaseData[key].name}</B.Col>
-											<B.Col sm={2}>
+											<B.Col sm={1}>
 												<PinSVG
 													color={firebaseData[key].color}
 													width='15px'
 													height='15px'
 												/>
 											</B.Col>
-											<B.Col sm={2}>{firebaseData[key].status || 'isOnline'}</B.Col>
+											<B.Col sm={3}>
+												<B.Button onClick={() => this.editWarrior(key)}>
+													Изменить
+												</B.Button>
+											</B.Col>
+											<B.Col sm={3}>
+												<B.Button onClick={() => this.deleteWarrior(key)}>
+													Удалить
+												</B.Button>
+											</B.Col>
 										</B.Row>
 									);
 								})
@@ -336,7 +348,7 @@ export default class App extends PureComponent {
 							{
 								mappedWarriors && mappedWarriors.map(warrior => (
 									!warrior.error &&
-										<B.Row key={warrior.lat + warrior.lng + warrior.battery_lvl}>
+										<B.Row key={warrior.lat + warrior.lng}>
 											<B.Col sm={4}>{warrior.name}</B.Col>
 											<B.Col sm={4}>lat: {warrior.lat}</B.Col>
 											<B.Col sm={4}>lng: {warrior.lng}</B.Col>
@@ -356,20 +368,3 @@ export default class App extends PureComponent {
 		);
 	}
 }
-
-export function PinSVG({ width = '100%', height = '100%', color }) {
-	return (
-		<svg xmlns="http://www.w3.org/2000/svg" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 426.667 426.667" width={width} height={height}>
-			<g>
-				<path d="M213.333,106.667c-58.88,0-106.667,47.787-106.667,106.667S154.453,320,213.333,320S320,272.213,320,213.333     S272.213,106.667,213.333,106.667z" fill={color}/>
-				<path d="M213.333,0C95.467,0,0,95.467,0,213.333s95.467,213.333,213.333,213.333S426.667,331.2,426.667,213.333     S331.2,0,213.333,0z M213.333,384c-94.293,0-170.667-76.373-170.667-170.667S119.04,42.667,213.333,42.667     S384,119.04,384,213.333S307.627,384,213.333,384z" fill={color}/>
-			</g>
-		</svg>
-	);
-}
-
-PinSVG.propTypes = {
-	width: PropTypes.string,
-	height: PropTypes.string,
-	color: PropTypes.string,
-};

@@ -2,6 +2,7 @@
   "name": "plasticwarriors",
   "version": "0.1.0",
   "private": true,
+  "homepage" : "https://sergeystepanenko.github.io/plasticWarriors/",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",

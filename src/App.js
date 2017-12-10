@@ -3,6 +3,7 @@ import * as firebase from 'firebase';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/css/bootstrap-theme.css';
 import * as B from 'react-bootstrap';
+import { CirclePicker } from 'react-color';
 
 import mapImg from './maps/map_1.jpg';
 // import mapKML from './maps/map.kml';
@@ -170,6 +171,10 @@ export default class App extends PureComponent {
 		});
 	}
 
+	handleChangeComplete = (color) => {
+		this.setState({ color: color.hex });
+	};
+
 	render() {
 		const {
 			mappedWarriors,
@@ -233,11 +238,7 @@ export default class App extends PureComponent {
 							<B.FormGroup>
 								<B.Col sm={12}>
 									<B.ControlLabel>Цвет метки на карте</B.ControlLabel>
-									<B.FormControl componentClass="select" onChange={(event) => this.handleFormChange('color', event)}>
-										<option value="red">красный</option>
-										<option value="green">зеленый</option>
-										<option value="yellow">желтый</option>
-									</B.FormControl>
+									<CirclePicker onChangeComplete={this.handleChangeComplete} />
 								</B.Col>
 							</B.FormGroup>
 

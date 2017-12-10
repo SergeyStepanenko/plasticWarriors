@@ -57,26 +57,25 @@ export default class App extends PureComponent {
 		});
 	}
 
-	requestData = ({ url, name, key, ...rest }) => {
+	requestData = ({ url, ...rest }) => {
 		return new Promise((resolve, reject) => {
 			const xhr = new XMLHttpRequest();
+			const wrappedUrl = `${CORS}${url}&mode=poll`;
 
-			xhr.open('GET', `${CORS}${url}&mode=poll`, true);
+			xhr.open('GET', wrappedUrl, true);
 			xhr.onload = function x() {
 				if (this.status === 200) {
 					resolve({
 						...JSON.parse(this.response),
 						...rest,
-						name,
-						key
+						url,
 					});
 				} else {
 					const error = new Error(this.statusText);
 					error.code = this.status;
 					reject({
 						...rest,
-						name,
-						key,
+						url,
 						error
 					});
 				}
@@ -106,8 +105,7 @@ export default class App extends PureComponent {
 	requestKidsTrackData = async (firebaseData) => {
 		const keys = Object.keys(firebaseData);
 		const promises = [
-			...keys.map(key =>
-			this.requestData({ url: firebaseData[key].url, name: firebaseData[key].name, key: key, ...firebaseData[key] }))
+			...keys.map(key => this.requestData({ ...firebaseData[key] }))
 		];
 		const mappedWarriors = await this.Promise_all(promises);
 

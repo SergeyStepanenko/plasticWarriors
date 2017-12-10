@@ -258,7 +258,7 @@ export default class App extends PureComponent {
 							const iconHeight = 15;
 							const shiftOnMap = `translate(${warrior.lngInPx - iconWidth / 2}px, ${warrior.ltdInPx - iconHeight / 2}px)`;
 							const pinStyles = {
-								position: 'relative',
+								position: 'absolute',
 								width: `${iconWidth}px`,
 								height: `${iconHeight}px`,
 								transform: shiftOnMap,

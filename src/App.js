@@ -28,7 +28,7 @@ export default class App extends PureComponent {
 		form: {
 			name: '',
 			url: '',
-			color: 'red'
+			color: '',
 		},
 		firebaseData: {},
 		mappedWarriors: [],
@@ -39,6 +39,8 @@ export default class App extends PureComponent {
 			west: 37.6171284914017,
 		},
 		positionedWarriors: [],
+		isTrackingDataLoading: true,
+		isFirebaseDataLoading: true,
 	}
 
 	componentDidMount() {
@@ -46,8 +48,31 @@ export default class App extends PureComponent {
 			this.setState({
 				firebaseData: snap.val()
 			}, () => {
-				this.requestKidsTrackData(this.state.firebaseData);
+				this.setState({ isFirebaseDataLoading: false });
+				this.requestAndPaintData();
+
+				// this.interval = setInterval(() => {
+				// 	console.log('request');
+				// 	this.requestAndPaintData();
+				// }, 30000);
 			});
+		});
+
+		window.addEventListener('resize', this.handleWindowsResize);
+	}
+
+	componentWillUnmount() {
+		clearInterval(this.interval);
+
+		window.removeEventListener('resize', this.handleWindowsResize);
+	}
+
+	handleWindowsResize = () => {
+		const imgParams = this.$image.getBoundingClientRect();
+		this.paintWarriorsOnMap({ imgData: imgParams, warriors: this.state.mappedWarriors });
+
+		this.setState({
+			imgParams,
 		});
 	}
 
@@ -67,7 +92,7 @@ export default class App extends PureComponent {
 			xhr.onload = function x() {
 				if (this.status === 200) {
 					resolve({
-						...JSON.parse(this.response),
+						...JSON.parse(this.response).payload[0].data,
 						...rest,
 						url,
 					});
@@ -128,6 +153,15 @@ export default class App extends PureComponent {
 		});
 	}
 
+	handleColorPick = (color) => {
+		this.setState({
+			form: {
+				...this.state.form,
+				color: color.hex,
+			}
+		});
+	};
+
 	handleSubmit = () => {
 		this.sendDataToFirebase({
 			name: this.state.form.name.trim(),
@@ -139,12 +173,12 @@ export default class App extends PureComponent {
 			form: {
 				name: '',
 				url: '',
-				color: 'red'
+				color: ''
 			}
 		});
 	}
 
-	paintWarriorsOnMap = (imgData, warriors) => {
+	paintWarriorsOnMap = ({ imgData, warriors }) => {
 		const { geoData } = this.state;
 		const Xscale = imgData.width / (geoData.east - geoData.west); // количество пикселей в одном градусе долготы (3093/0,0166=186325)
 		const Yscale = imgData.height / (geoData.north - geoData.south);  // количество пикселей в одном градусе широты (3093/0,00938=329744)
@@ -162,18 +196,16 @@ export default class App extends PureComponent {
 		});
 	}
 
-	handleMapRefresh = () => {
+	requestAndPaintData = () => {
 		this.setState({
 			imgParams: this.$image.getBoundingClientRect(),
+			isTrackingDataLoading: true,
 		}, async () => {
 			await this.requestKidsTrackData(this.state.firebaseData);
-			this.paintWarriorsOnMap(this.state.imgParams, this.state.mappedWarriors);
+			this.setState({ isTrackingDataLoading: false });
+			this.paintWarriorsOnMap({ imgData: this.state.imgParams, warriors: this.state.mappedWarriors });
 		});
 	}
-
-	handleChangeComplete = (color) => {
-		this.setState({ color: color.hex });
-	};
 
 	render() {
 		const {
@@ -181,9 +213,13 @@ export default class App extends PureComponent {
 			firebaseData,
 			form,
 			positionedWarriors,
+			isTrackingDataLoading,
+			isFirebaseDataLoading,
 		} = this.state;
 
-		return(
+		const isDisabled = ~Object.values(form).indexOf('');
+
+		return (
 			<div>
 				<B.Col xs={8} md={8}>
 					<div style={{ position: 'absolute' }} ref={(r) => { this.$image = r; }}>
@@ -202,8 +238,21 @@ export default class App extends PureComponent {
 								transform: `translate(${warrior.lngInPx}px, ${warrior.ltdInPx}px)`,
 							};
 
+							const tooltip = (
+								<B.Tooltip id="tooltip">
+									<p>{`Имя: ${warrior.name}`}</p>
+									<p>{`Уровень заряда: ${warrior.batteryLvl}`}</p>
+									<p>{`Acc: ${warrior.acc}`}</p>
+									<p>{`Sleep: ${warrior.sleep}`}</p>
+								</B.Tooltip>
+							);
+
 							return (
-								<div key={`${warrior.name} ${warrior.key}`} style={style}/>
+								<div key={`${warrior.name} ${warrior.key}`}>
+									<B.OverlayTrigger id={warrior.key} overlay={tooltip}>
+										<div style={style}/>
+									</B.OverlayTrigger>
+								</div>
 							);
 						})
 					}
@@ -237,8 +286,11 @@ export default class App extends PureComponent {
 
 							<B.FormGroup>
 								<B.Col sm={12}>
-									<B.ControlLabel>Цвет метки на карте</B.ControlLabel>
-									<CirclePicker onChangeComplete={this.handleChangeComplete} />
+									<B.ControlLabel style={{ marginBottom: '10px' }}>Цвет метки на карте</B.ControlLabel>
+									<CirclePicker
+										onChangeComplete={this.handleColorPick}
+										color={this.state.form.color}
+									/>
 								</B.Col>
 							</B.FormGroup>
 
@@ -247,9 +299,9 @@ export default class App extends PureComponent {
 									<B.Button
 										type="submit"
 										onClick={this.handleSubmit}
-										disabled={form.name === '' || form.url === ''}
+										disabled={isDisabled}
 									>
-										Добавить
+										{isDisabled ? 'Добавить' : 'В процессе'}
 									</B.Button>
 								</B.Col>
 							</B.FormGroup>
@@ -284,7 +336,12 @@ export default class App extends PureComponent {
 							}
 						</B.FormGroup>
 					</B.Panel>
-					<B.Button onClick={this.handleMapRefresh}>Обновить карту</B.Button>
+					<B.Button
+						onClick={this.requestAndPaintData}
+						disabled={isTrackingDataLoading}
+					>
+						{isTrackingDataLoading ? 'Обновляется' : 'Обновить карту'}
+					</B.Button>
 				</B.Col>
 			</div>
 		);

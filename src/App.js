@@ -59,10 +59,9 @@ export default class App extends PureComponent {
 				this.setState({ isFirebaseDataLoading: false });
 				this.requestAndHandleResponse();
 
-				// this.interval = setInterval(() => {
-				// 	console.log('request');
-				// 	this.requestAndHandleResponse();
-				// }, 30000);
+				this.interval = setInterval(() => {
+					this.requestAndHandleResponse();
+				}, 30000);
 			});
 		});
 

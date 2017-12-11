@@ -89,9 +89,7 @@ export default class WarriorForm extends PureComponent {
 							</B.Button>
 							{
 								form.type === 'edit' &&
-									<B.Button
-										onClick={() => this.props.handleFormReset()}
-									>
+									<B.Button onClick={() => this.props.handleFormReset()}>
 										{STRINGS[form.type].reset}
 									</B.Button>
 							}

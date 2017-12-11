@@ -10,8 +10,9 @@ import {
 	Modal,
 	WarriorForm,
 	Warriors,
+	Panel,
+	PinSVG,
 } from './_blocks';
-import PinSVG from './_blocks/pin';
 
 const config = {
 	apiKey: 'AIzaSyCB1TfuGQegOrHOPcFJFqpxDmMTSElXQVg',
@@ -257,36 +258,7 @@ export default class App extends PureComponent {
 						/>
 					</B.Col>
 					<B.Col md={4}>
-						<B.Panel header={'Пластиковые воины:'} bsStyle="primary">
-							<B.FormGroup>
-								{
-									Object.keys(firebaseData).map((key) => {
-										return(
-											<B.Row key={key}>
-												<B.Col sm={3}>{firebaseData[key].name}</B.Col>
-												<B.Col sm={1}>
-													<PinSVG
-														color={firebaseData[key].color}
-														width='15px'
-														height='15px'
-													/>
-												</B.Col>
-												<B.Col sm={3}>
-													<B.Button onClick={() => this.editWarrior({ firebaseData, key })}>
-														Изменить
-													</B.Button>
-												</B.Col>
-												<B.Col sm={3}>
-													<B.Button onClick={() => this.deleteWarrior(key)}>
-														Удалить
-													</B.Button>
-												</B.Col>
-											</B.Row>
-										);
-									})
-								}
-							</B.FormGroup>
-						</B.Panel>
+						<Panel firebaseData={firebaseData}/>
 					</B.Col>
 					<B.Col md={4}>
 						<B.Panel header={'Данные геопозиции:'} bsStyle="primary">

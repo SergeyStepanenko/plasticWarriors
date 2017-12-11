@@ -242,112 +242,122 @@ export default class App extends PureComponent {
 					show={modal.show}
 					onHide={this.modalHide}
 				/>
-				<B.Col xs={8} md={8}>
-					<div
-						style={{ position: 'absolute' }}
-						ref={(r) => { this.$image = r; }}
-					>
-						<B.Image
-							src={mapImg}
-							responsive
-						/>
-					</div>
-					{
-						positionedWarriors.map((warrior) => {
-							const iconWidth = 15;
-							const iconHeight = 15;
-							const shiftOnMap = `translate(${warrior.lngInPx - iconWidth / 2}px, ${warrior.ltdInPx - iconHeight / 2}px)`;
-							const pinStyles = {
-								position: 'absolute',
-								width: `${iconWidth}px`,
-								height: `${iconHeight}px`,
-								transform: shiftOnMap,
-							};
+				<B.Col md={12}>
+					<B.Row>
+						<B.Col md={3}>
+							<WarriorForm
+								form={form}
+								handleFormChange={this.handleFormChange}
+								handleSubmit={this.handleSubmit}
+								handleColorPick={this.handleColorPick}
+								handleFormReset={this.resetForm}
+							/>
+						</B.Col>
+						<B.Col md={4}>
+							<B.Panel header={'Пластиковые воины:'} bsStyle="primary">
+								<B.FormGroup>
+									{
+										Object.keys(firebaseData).map((key) => {
+											return(
+												<B.Row key={key}>
+													<B.Col sm={3}>{firebaseData[key].name}</B.Col>
+													<B.Col sm={1}>
+														<PinSVG
+															color={firebaseData[key].color}
+															width='15px'
+															height='15px'
+														/>
+													</B.Col>
+													<B.Col sm={3}>
+														<B.Button onClick={() => this.editWarrior({ firebaseData, key })}>
+															Изменить
+														</B.Button>
+													</B.Col>
+													<B.Col sm={3}>
+														<B.Button onClick={() => this.deleteWarrior(key)}>
+															Удалить
+														</B.Button>
+													</B.Col>
+												</B.Row>
+											);
+										})
+									}
+								</B.FormGroup>
+							</B.Panel>
+						</B.Col>
+						<B.Col md={4}>
+							<B.Panel header={'Данные геопозиции:'} bsStyle="primary">
+								<B.FormGroup>
+									{
+										mappedWarriors && mappedWarriors.map(warrior => (
+											!warrior.error &&
+												<B.Row key={warrior.lat + warrior.lng}>
+													<B.Col sm={4}>{warrior.name}</B.Col>
+													<B.Col sm={4}>lat: {warrior.lat}</B.Col>
+													<B.Col sm={4}>lng: {warrior.lng}</B.Col>
+												</B.Row>
+										))
+									}
+								</B.FormGroup>
+							</B.Panel>
+							<B.Button
+								onClick={this.requestAndHandleResponse}
+								disabled={isTrackingDataLoading}
+							>
+								{isTrackingDataLoading ? 'Обновляется' : 'Обновить карту'}
+							</B.Button>
+						</B.Col>
+					</B.Row>
+					<B.Row>
+						<B.Col md={12}>
+							<div
+								style={{ position: 'absolute' }}
+								ref={(r) => { this.$image = r; }}
+							>
+								<B.Image
+									src={mapImg}
+									responsive
+								/>
+							</div>
+						</B.Col>
+						{
+							positionedWarriors.map((warrior) => {
+								const iconWidth = 15;
+								const iconHeight = 15;
+								const shiftOnMap = `translate(${warrior.lngInPx - iconWidth / 2}px, ${warrior.ltdInPx - iconHeight / 2}px)`;
+								const pinStyles = {
+									position: 'absolute',
+									width: `${iconWidth}px`,
+									height: `${iconHeight}px`,
+									transform: shiftOnMap,
+								};
 
-							const tooltipStyles = {
-								display: 'flex',
-								flexFlow: 'column',
-							};
+								const tooltipStyles = {
+									display: 'flex',
+									flexFlow: 'column',
+								};
 
-							const tooltip = (
-								<B.Tooltip id="tooltip" style={tooltipStyles}>
-									<div>{`Имя: ${warrior.name}`}</div>
-									<div>{`Уровень заряда: ${warrior.batteryLvl}`}</div>
-									<div>{`Acc: ${warrior.acc}`}</div>
-									<div>{`Sleep: ${warrior.sleep}`}</div>
-								</B.Tooltip>
-							);
+								const tooltip = (
+									<B.Tooltip id="tooltip" style={tooltipStyles}>
+										<div>{`Имя: ${warrior.name}`}</div>
+										<div>{`Уровень заряда: ${warrior.batteryLvl}`}</div>
+										<div>{`Acc: ${warrior.acc}`}</div>
+										<div>{`Sleep: ${warrior.sleep}`}</div>
+									</B.Tooltip>
+								);
 
-							return (
-								<div key={`${warrior.name} ${warrior.key}`}>
-									<B.OverlayTrigger id={warrior.key} overlay={tooltip}>
-										<div style={pinStyles}>
-											<PinSVG color={warrior.color} />
-										</div>
-									</B.OverlayTrigger>
-								</div>
-							);
-						})
-					}
-				</B.Col>
-				<B.Col xs={4} md={4}>
-					<WarriorForm
-						form={form}
-						handleFormChange={this.handleFormChange}
-						handleSubmit={this.handleSubmit}
-						handleColorPick={this.handleColorPick}
-						handleFormReset={this.resetForm}
-					/>
-					<B.Panel header={'Пластиковые воины:'} bsStyle="primary">
-						<B.FormGroup>
-							{
-								Object.keys(firebaseData).map((key) => {
-									return(
-										<B.Row key={key}>
-											<B.Col sm={3}>{firebaseData[key].name}</B.Col>
-											<B.Col sm={1}>
-												<PinSVG
-													color={firebaseData[key].color}
-													width='15px'
-													height='15px'
-												/>
-											</B.Col>
-											<B.Col sm={3}>
-												<B.Button onClick={() => this.editWarrior({ firebaseData, key })}>
-													Изменить
-												</B.Button>
-											</B.Col>
-											<B.Col sm={3}>
-												<B.Button onClick={() => this.deleteWarrior(key)}>
-													Удалить
-												</B.Button>
-											</B.Col>
-										</B.Row>
-									);
-								})
-							}
-						</B.FormGroup>
-					</B.Panel>
-					<B.Panel header={'Данные геопозиции:'} bsStyle="primary">
-						<B.FormGroup>
-							{
-								mappedWarriors && mappedWarriors.map(warrior => (
-									!warrior.error &&
-										<B.Row key={warrior.lat + warrior.lng}>
-											<B.Col sm={4}>{warrior.name}</B.Col>
-											<B.Col sm={4}>lat: {warrior.lat}</B.Col>
-											<B.Col sm={4}>lng: {warrior.lng}</B.Col>
-										</B.Row>
-								))
-							}
-						</B.FormGroup>
-					</B.Panel>
-					<B.Button
-						onClick={this.requestAndHandleResponse}
-						disabled={isTrackingDataLoading}
-					>
-						{isTrackingDataLoading ? 'Обновляется' : 'Обновить карту'}
-					</B.Button>
+								return (
+									<div key={`${warrior.name} ${warrior.key}`}>
+										<B.OverlayTrigger id={warrior.key} overlay={tooltip}>
+											<div style={pinStyles}>
+												<PinSVG color={warrior.color} />
+											</div>
+										</B.OverlayTrigger>
+									</div>
+								);
+							})
+						}
+					</B.Row>
 				</B.Col>
 			</div>
 		);

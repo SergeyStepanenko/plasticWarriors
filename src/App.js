@@ -9,8 +9,9 @@ import mapImg from './maps/map_1.jpg';
 import {
 	Modal,
 	WarriorForm,
-	PinSVG,
+	Warriors,
 } from './_blocks';
+import PinSVG from './_blocks/pin';
 
 const config = {
 	apiKey: 'AIzaSyCB1TfuGQegOrHOPcFJFqpxDmMTSElXQVg',
@@ -131,7 +132,7 @@ export default class App extends PureComponent {
 	requestKidsTrackData = async (firebaseData) => {
 		const keys = Object.keys(firebaseData);
 		const promises = [
-			...keys.map(key => requestData({ CORS, ...firebaseData[key] }))
+			...keys.map(key => requestData({ CORS, key, ...firebaseData[key] }))
 		];
 		const mappedWarriors = await Promise_all(promises);
 
@@ -168,10 +169,14 @@ export default class App extends PureComponent {
 		const Yscale = imgData.height / (geoData.north - geoData.south);  // количество пикселей в одном градусе широты (3093/0,00938=329744)
 
 		const positionedWarriors = warriors.map((warrior) => {
+			const isInLngRange = warrior.lng > geoData.west && warrior.lng < geoData.east;
+			const isInlatRange = warrior.lat > geoData.south && warrior.lat < geoData.north;
+
 			return {
 				...warrior,
 				lngInPx: (warrior.lng - geoData.west) * Xscale,
 				ltdInPx: (geoData.north - warrior.lat) * Yscale,
+				isInRange: isInLngRange && isInlatRange,
 			};
 		});
 
@@ -225,7 +230,6 @@ export default class App extends PureComponent {
 
 	render() {
 		const {
-			mappedWarriors,
 			firebaseData,
 			form,
 			positionedWarriors,
@@ -288,12 +292,22 @@ export default class App extends PureComponent {
 						<B.Panel header={'Данные геопозиции:'} bsStyle="primary">
 							<B.FormGroup>
 								{
-									mappedWarriors && mappedWarriors.map(warrior => (
+									positionedWarriors && positionedWarriors.map(warrior => (
 										!warrior.error &&
-											<B.Row key={warrior.lat + warrior.lng}>
-												<B.Col sm={4}>{warrior.name}</B.Col>
-												<B.Col sm={4}>lat: {warrior.lat}</B.Col>
-												<B.Col sm={4}>lng: {warrior.lng}</B.Col>
+											<B.Row key={warrior.key || Math.random()}>
+												<B.Col sm={2}>{warrior.name}</B.Col>
+												<B.Col sm={3}>
+													<PinSVG
+														color={warrior.color}
+														width='15px'
+														height='15px'
+													/>
+												</B.Col>
+												<B.Col sm={3}>
+													<p>lat: {warrior.lat}</p>
+													<p>lng: {warrior.lng}</p>
+												</B.Col>
+												<B.Col sm={3}>{`На карте? ${warrior.isInRange}`}</B.Col>
 											</B.Row>
 									))
 								}
@@ -317,43 +331,7 @@ export default class App extends PureComponent {
 							responsive
 						/>
 					</div>
-					{
-						positionedWarriors.map((warrior) => {
-							const iconWidth = 15;
-							const iconHeight = 15;
-							const shiftOnMap = `translate(${warrior.lngInPx - iconWidth / 2}px, ${warrior.ltdInPx - iconHeight / 2}px)`;
-							const pinStyles = {
-								position: 'absolute',
-								width: `${iconWidth}px`,
-								height: `${iconHeight}px`,
-								transform: shiftOnMap,
-							};
-
-							const tooltipStyles = {
-								display: 'flex',
-								flexFlow: 'column',
-							};
-
-							const tooltip = (
-								<B.Tooltip id="tooltip" style={tooltipStyles}>
-									<div>{`Имя: ${warrior.name}`}</div>
-									<div>{`Уровень заряда: ${warrior.batteryLvl}`}</div>
-									<div>{`Acc: ${warrior.acc}`}</div>
-									<div>{`Sleep: ${warrior.sleep}`}</div>
-								</B.Tooltip>
-							);
-
-							return (
-								<div key={`${warrior.name} ${warrior.key}`}>
-									<B.OverlayTrigger id={warrior.key} overlay={tooltip}>
-										<div style={pinStyles}>
-											<PinSVG color={warrior.color} />
-										</div>
-									</B.OverlayTrigger>
-								</div>
-							);
-						})
-					}
+					<Warriors positionedWarriors={positionedWarriors}/>
 				</B.Row>
 			</div>
 		);

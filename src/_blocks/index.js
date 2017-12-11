@@ -1,9 +1,9 @@
 import Modal from './modal';
 import WarriorForm from './form';
-import PinSVG from './pin';
+import Warriors from './warriors';
 
 export {
 	Modal,
 	WarriorForm,
-	PinSVG
+	Warriors,
 };

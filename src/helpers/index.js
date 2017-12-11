@@ -1,4 +1,4 @@
-export const requestData = ({ CORS, url, ...rest }) => {
+export const requestData = ({ CORS, url, key, ...rest }) => {
 	return new Promise((resolve, reject) => {
 		const xhr = new XMLHttpRequest();
 		const wrappedUrl = `${CORS}${url}&mode=poll`;
@@ -9,6 +9,7 @@ export const requestData = ({ CORS, url, ...rest }) => {
 				resolve({
 					...JSON.parse(this.response).payload[0].data,
 					...rest,
+					key,
 					url,
 				});
 			} else {
@@ -16,6 +17,7 @@ export const requestData = ({ CORS, url, ...rest }) => {
 				error.code = this.status;
 				reject({
 					...rest,
+					key,
 					url,
 					error
 				});

@@ -5,7 +5,7 @@ import { CirclePicker } from 'react-color';
 
 const STRINGS = {
 	add: {
-		header: 'Пластиковые воины:',
+		header: 'Добавить или изменить воина:',
 		name: 'Имя воина',
 		enterName: 'Введите имя воина',
 		link: 'Ссылка из trackKids',
@@ -14,7 +14,7 @@ const STRINGS = {
 		submit: 'Добавить',
 	},
 	edit: {
-		header: 'Пластиковые воины:',
+		header: 'Добавить или изменить воина:',
 		name: 'Введите новое имя воина',
 		enterName: 'Введите новое имя воина',
 		link: 'Введите новую ссылку из trackKids',

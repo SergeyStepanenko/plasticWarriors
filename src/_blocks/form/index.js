@@ -43,7 +43,7 @@ export default class WarriorForm extends PureComponent {
 				<B.Panel header={CONSTANTS[form.type].header} bsStyle="primary">
 					<B.Col md={4}>
 						<B.FormGroup>
-							<B.Col sm={4}>
+							<B.Col md={12}>
 								<B.ControlLabel>{CONSTANTS[form.type].name}</B.ControlLabel>
 								<B.FormControl
 									placeholder={CONSTANTS[form.type].enterName}
@@ -53,7 +53,7 @@ export default class WarriorForm extends PureComponent {
 							</B.Col>
 						</B.FormGroup>
 						<B.FormGroup>
-							<B.Col sm={4}>
+							<B.Col sm={12}>
 								<B.ControlLabel>{CONSTANTS[form.type].link}</B.ControlLabel>
 								<B.FormControl
 									placeholder={CONSTANTS[form.type].enterLink}
@@ -63,9 +63,9 @@ export default class WarriorForm extends PureComponent {
 							</B.Col>
 						</B.FormGroup>
 					</B.Col>
-					<B.Col md={3}>
+					<B.Col md={6}>
 						<B.FormGroup>
-							<B.Col sm={4}>
+							<B.Col sm={6}>
 								<B.ControlLabel>
 									{CONSTANTS[form.type].pinColor}
 								</B.ControlLabel>
@@ -76,7 +76,7 @@ export default class WarriorForm extends PureComponent {
 							</B.Col>
 						</B.FormGroup>
 					</B.Col>
-					<B.Col md={4}>
+					<B.Col md={2}>
 						<B.FormGroup>
 							<B.Col sm={4}>
 								<B.Button

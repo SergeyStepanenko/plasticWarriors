@@ -4,9 +4,6 @@ body {
   overflow-x: hidden;
   font-family: sans-serif; }
 
-.row {
-  margin: 0; }
-
 .app__header {
   display: flex;
   align-items: center;
@@ -24,4 +21,20 @@ body {
 
 .app__warriors {
   position: absolute;
-  top: 40px; }
+  top: 0px; }
+
+.app__panel {
+  display: flex; }
+  .app__panel > div {
+    flex-wrap: nowrap; }
+
+.panel .panel-heading,
+.panel .panel-body {
+  padding-left: 30px; }
+
+.row {
+  margin: 0; }
+
+.circle-picker {
+  margin-top: 10px;
+  width: 380px !important; }

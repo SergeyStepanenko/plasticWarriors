@@ -250,9 +250,6 @@ export default class App extends PureComponent {
 					show={modal.show}
 					onHide={this.modalHide}
 				/>
-				<B.Row className='app__header'>
-					Юнит-трекер
-				</B.Row>
 				<B.Row>
 					<div className='app__map' ref={(r) => { this.$image = r; }}	>
 						<B.Image
@@ -265,63 +262,32 @@ export default class App extends PureComponent {
 					</div>
 				</B.Row>
 				<B.Row>
-					<B.Col md={3}>
-						<WarriorForm
-							form={form}
-							handleFormChange={this.handleFormChange}
-							handleSubmit={this.handleSubmit}
-							handleColorPick={this.handleColorPick}
-							handleFormReset={this.resetForm}
+					<WarriorForm
+						form={form}
+						handleFormChange={this.handleFormChange}
+						handleSubmit={this.handleSubmit}
+						handleColorPick={this.handleColorPick}
+						handleFormReset={this.resetForm}
+					/>
+				</B.Row>
+				<B.Row>
+					<B.Col>
+						<Panel
+							firebaseData={firebaseData}
+							editWarrior={this.editWarrior}
+							deleteWarrior={this.deleteWarrior}
+							positionedWarriors={positionedWarriors}
 						/>
-					</B.Col>
-					<B.Col md={4}>
-						<Panel firebaseData={firebaseData}/>
-					</B.Col>
-					<B.Col md={4}>
-						<B.Panel header={'Данные геопозиции:'} bsStyle="primary">
-							<B.FormGroup>
-								{
-									positionedWarriors && positionedWarriors.map(warrior => (
-										!warrior.error &&
-											<B.Row key={warrior.key || Math.random()}>
-												<B.Col sm={2}>{warrior.name}</B.Col>
-												<B.Col sm={3}>
-													<PinSVG
-														color={warrior.color}
-														width='15px'
-														height='15px'
-													/>
-												</B.Col>
-												<B.Col sm={3}>
-													<p>lat: {warrior.lat}</p>
-													<p>lng: {warrior.lng}</p>
-												</B.Col>
-												<B.Col sm={3}>{`На карте? ${warrior.isInRange}`}</B.Col>
-											</B.Row>
-									))
-								}
-							</B.FormGroup>
-						</B.Panel>
-						<B.Button
-							onClick={this.requestAndHandleResponse}
-							disabled={isTrackingDataLoading}
-						>
-							{isTrackingDataLoading ? 'Обновляется' : 'Обновить карту'}
-						</B.Button>
 					</B.Col>
 				</B.Row>
-				{/* <B.Row>
-					<div
-						className='app_map'
-						ref={(r) => { this.$image = r; }}
+				<B.Row>
+					<B.Button
+						onClick={this.requestAndHandleResponse}
+						disabled={isTrackingDataLoading}
 					>
-						<B.Image
-							src={mapImg}
-							responsive
-						/>
-					</div>
-					<Warriors positionedWarriors={positionedWarriors}/>
-				</B.Row> */}
+						{isTrackingDataLoading ? 'Обновляется' : 'Обновить карту'}
+					</B.Button>
+				</B.Row>
 			</div>
 		);
 	}

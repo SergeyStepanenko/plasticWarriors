@@ -5,9 +5,6 @@ body {
 	font-family: sans-serif;
 }
 
-.row {
-	margin: 0;
-}
 
 .app {
 	&__header {
@@ -28,6 +25,32 @@ body {
 	}
 	&__warriors {
 		position: absolute;
-		top: 40px;
+		top: 0px;
+	}
+	&__panel {
+		display: flex;
+		> div {
+			flex-wrap: nowrap;
+		}
 	}
 }
+
+// bootstrap styles reassignment
+.panel {
+	.panel-heading,
+	.panel-body {
+		padding-left: 30px;
+	}
+}
+
+.row {
+	margin: 0;
+}
+// bootstrap styles reassignment
+
+// colorPicker reassignment
+.circle-picker {
+	margin-top: 10px;
+	width: 380px !important;
+}
+// colorPicker reassignment

@@ -27,12 +27,12 @@ export default class Panel extends PureComponent {
 										/>
 									</B.Col>
 									<B.Col sm={3}>
-										<B.Button onClick={() => this.editWarrior({ firebaseData, key })}>
+										<B.Button onClick={() => this.props.editWarrior({ firebaseData, key })}>
 											Изменить
 										</B.Button>
 									</B.Col>
 									<B.Col sm={3}>
-										<B.Button onClick={() => this.deleteWarrior(key)}>
+										<B.Button onClick={() => this.props.deleteWarrior(key)}>
 											Удалить
 										</B.Button>
 									</B.Col>

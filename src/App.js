@@ -51,6 +51,9 @@ export default class App extends PureComponent {
 		modal: {
 			type: '',
 		},
+		imgParams: {
+			height: 0,
+		},
 	}
 
 	componentDidMount() {
@@ -247,6 +250,20 @@ export default class App extends PureComponent {
 					show={modal.show}
 					onHide={this.modalHide}
 				/>
+				<B.Row className='app__header'>
+					Юнит-трекер
+				</B.Row>
+				<B.Row>
+					<div className='app__map' ref={(r) => { this.$image = r; }}	>
+						<B.Image
+							src={mapImg}
+							responsive
+						/>
+					</div>
+					<div className='app__warriors'>
+						<Warriors positionedWarriors={positionedWarriors}/>
+					</div>
+				</B.Row>
 				<B.Row>
 					<B.Col md={3}>
 						<WarriorForm
@@ -293,9 +310,9 @@ export default class App extends PureComponent {
 						</B.Button>
 					</B.Col>
 				</B.Row>
-				<B.Row>
+				{/* <B.Row>
 					<div
-						style={{ position: 'absolute' }}
+						className='app_map'
 						ref={(r) => { this.$image = r; }}
 					>
 						<B.Image
@@ -304,7 +321,7 @@ export default class App extends PureComponent {
 						/>
 					</div>
 					<Warriors positionedWarriors={positionedWarriors}/>
-				</B.Row>
+				</B.Row> */}
 			</div>
 		);
 	}

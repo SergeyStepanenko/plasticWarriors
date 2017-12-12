@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import * as B from 'react-bootstrap';
 import { CirclePicker } from 'react-color';
 
-const STRINGS = {
+const CONSTANTS = {
 	add: {
-		header: 'Добавить или изменить воина:',
+		header: 'Добавление юнита:',
 		name: 'Имя воина',
 		enterName: 'Введите имя воина',
 		link: 'Ссылка из trackKids',
@@ -14,7 +14,7 @@ const STRINGS = {
 		submit: 'Добавить',
 	},
 	edit: {
-		header: 'Добавить или изменить воина:',
+		header: 'Изменение юнита:',
 		name: 'Введите новое имя воина',
 		enterName: 'Введите новое имя воина',
 		link: 'Введите новую ссылку из trackKids',
@@ -23,10 +23,6 @@ const STRINGS = {
 		submit: 'Изменить',
 		reset: 'Отмена'
 	}
-};
-
-const style = {
-	marginBottom: '10px'
 };
 
 export default class WarriorForm extends PureComponent {
@@ -44,57 +40,60 @@ export default class WarriorForm extends PureComponent {
 
 		return (
 			<B.Form horizontal>
-				<B.Panel header={STRINGS[form.type].header} bsStyle="primary">
-					<B.FormGroup>
-						<B.Col sm={12}>
-							<B.ControlLabel>{STRINGS[form.type].name}</B.ControlLabel>
-							<B.FormControl
-								placeholder={STRINGS[form.type].enterName}
-								onChange={(event) => this.props.handleFormChange('name', event)}
-								value={form.name}
-							/>
-						</B.Col>
-					</B.FormGroup>
-
-					<B.FormGroup>
-						<B.Col sm={12}>
-							<B.ControlLabel>{STRINGS[form.type].link}</B.ControlLabel>
-							<B.FormControl
-								placeholder={STRINGS[form.type].enterLink}
-								onChange={(event) => this.props.handleFormChange('url', event)}
-								value={form.url}
-							/>
-						</B.Col>
-					</B.FormGroup>
-
-					<B.FormGroup>
-						<B.Col sm={12}>
-							<B.ControlLabel style={style}>
-								{STRINGS[form.type].pinColor}
-							</B.ControlLabel>
-							<CirclePicker
-								onChangeComplete={this.props.handleColorPick}
-								color={form.color}
-							/>
-						</B.Col>
-					</B.FormGroup>
-
-					<B.FormGroup>
-						<B.Col sm={12}>
-							<B.Button
-								onClick={() => this.props.handleSubmit(form.key)}
-								disabled={isFormCompleted}
-							>
-								{STRINGS[form.type].submit}
-							</B.Button>
-							{
-								form.type === 'edit' &&
-									<B.Button onClick={() => this.props.handleFormReset()}>
-										{STRINGS[form.type].reset}
-									</B.Button>
-							}
-						</B.Col>
-					</B.FormGroup>
+				<B.Panel header={CONSTANTS[form.type].header} bsStyle="primary">
+					<B.Col md={4}>
+						<B.FormGroup>
+							<B.Col sm={4}>
+								<B.ControlLabel>{CONSTANTS[form.type].name}</B.ControlLabel>
+								<B.FormControl
+									placeholder={CONSTANTS[form.type].enterName}
+									onChange={(event) => this.props.handleFormChange('name', event)}
+									value={form.name}
+								/>
+							</B.Col>
+						</B.FormGroup>
+						<B.FormGroup>
+							<B.Col sm={4}>
+								<B.ControlLabel>{CONSTANTS[form.type].link}</B.ControlLabel>
+								<B.FormControl
+									placeholder={CONSTANTS[form.type].enterLink}
+									onChange={(event) => this.props.handleFormChange('url', event)}
+									value={form.url}
+								/>
+							</B.Col>
+						</B.FormGroup>
+					</B.Col>
+					<B.Col md={3}>
+						<B.FormGroup>
+							<B.Col sm={4}>
+								<B.ControlLabel>
+									{CONSTANTS[form.type].pinColor}
+								</B.ControlLabel>
+								<CirclePicker
+									onChangeComplete={this.props.handleColorPick}
+									color={form.color}
+								/>
+							</B.Col>
+						</B.FormGroup>
+					</B.Col>
+					<B.Col md={4}>
+						<B.FormGroup>
+							<B.Col sm={4}>
+								<B.Button
+									onClick={() => this.props.handleSubmit(form.key)}
+									disabled={isFormCompleted}
+								>
+									{CONSTANTS[form.type].submit}
+								</B.Button>
+								{
+									form.type === 'edit' &&
+										<B.Button onClick={() => this.props.handleFormReset()}>
+											{CONSTANTS[form.type].reset}
+										</B.Button>
+								}
+							</B.Col>
+						</B.FormGroup>
+					</B.Col>
 				</B.Panel>
 			</B.Form>
 		);

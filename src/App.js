@@ -11,7 +11,6 @@ import {
 	WarriorForm,
 	Warriors,
 	Panel,
-	PinSVG,
 } from './_blocks';
 
 const config = {
@@ -29,15 +28,17 @@ const CORS = 'https://cors-anywhere.herokuapp.com/';
 const database = firebase.database();
 const rootRef = database.ref('/');
 
+const formInitialState = {
+	name: '',
+	url: '',
+	color: '',
+	key: null,
+	type: 'add',
+};
+
 export default class App extends PureComponent {
 	state = {
-		form: {
-			name: '',
-			url: '',
-			color: '',
-			key: null,
-			type: 'add',
-		},
+		form: formInitialState,
 		firebaseData: {},
 		mappedWarriors: [],
 		geoData: {
@@ -92,13 +93,7 @@ export default class App extends PureComponent {
 
 	resetForm = () => {
 		this.setState({
-			form: {
-				name: '',
-				url: '',
-				color: '',
-				key: null,
-				type: 'add',
-			},
+			form: formInitialState,
 		});
 	}
 
@@ -213,6 +208,7 @@ export default class App extends PureComponent {
 	}
 
 	deleteWarrior = (key) => {
+
 		this.setState({
 			modal: {
 				...this.state.modal,
@@ -220,7 +216,8 @@ export default class App extends PureComponent {
 				show: true,
 				key,
 				action: this.deleteDataFromFirebase,
-			}
+			},
+			form: formInitialState,
 		});
 	}
 
@@ -239,17 +236,19 @@ export default class App extends PureComponent {
 			positionedWarriors,
 			isTrackingDataLoading,
 			modal,
-			// isFirebaseDataLoading,
+			keys,
 		} = this.state;
-
 
 		return (
 			<div>
-				<Modal
-					config={modal}
-					show={modal.show}
-					onHide={this.modalHide}
-				/>
+				{
+					modal.show &&
+						<Modal
+							config={modal}
+							show
+							onHide={this.modalHide}
+						/>
+				}
 				<B.Row>
 					<div className='app__map' ref={(r) => { this.$image = r; }}	>
 						<B.Image
@@ -273,6 +272,7 @@ export default class App extends PureComponent {
 				<B.Row>
 					<B.Col>
 						<Panel
+							keys={keys}
 							firebaseData={firebaseData}
 							editWarrior={this.editWarrior}
 							deleteWarrior={this.deleteWarrior}

@@ -6,6 +6,9 @@ import { PinSVG } from '../index';
 export default class Panel extends PureComponent {
 	static propTypes = {
 		firebaseData: PropTypes.object.isRequired,
+		positionedWarriors: PropTypes.array.isRequired,
+		editWarrior: PropTypes.func.isRequired,
+		deleteWarrior: PropTypes.func.isRequired,
 	}
 
 	render() {
@@ -18,7 +21,7 @@ export default class Panel extends PureComponent {
 						{
 							Object.keys(firebaseData).map((key) => {
 								return(
-									<div key={key}>
+									<div key={key} className='app__block'>
 										<B.Col sm={3}>{firebaseData[key].name}</B.Col>
 										<B.Col sm={1}>
 											<PinSVG
@@ -46,15 +49,15 @@ export default class Panel extends PureComponent {
 						{
 							positionedWarriors && positionedWarriors.map(warrior => (
 								!warrior.error &&
-									<div key={warrior.key || Math.random()}>
+									<div key={warrior.key || Math.random()} className='app__block'>
 										<B.Col sm={4}>
-											<div>lat: {warrior.lat}</div>
+											<div>{`lat:${warrior.lat}`}</div>
 										</B.Col>
 										<B.Col sm={4}>
-											<div>lng: {warrior.lng}</div>
+											<div>{`lng:${warrior.lng}`}</div>
 										</B.Col>
 										<B.Col sm={4}>
-											<div>{`На карте? ${warrior.isInRange}`}</div>
+											<div>{warrior.isInRange ? 'На карте' : 'Вне карты'}</div>
 										</B.Col>
 									</div>
 							))

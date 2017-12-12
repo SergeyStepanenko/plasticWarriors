@@ -7,16 +7,6 @@ body {
 
 
 .app {
-	&__header {
-		display: flex;
-		align-items: center;
-		width: 100%;
-		height: 40px;
-		margin: 0 !important;
-		padding-left: 20px;
-		color: #fff;
-		background-color: #3973ab;
-	}
 	&__map {
 		width: 100%;
 		img {
@@ -29,8 +19,12 @@ body {
 	}
 	&__panel {
 		display: flex;
+	}
+	&__block {
 		> div {
-			flex-wrap: nowrap;
+			height: 40px;
+			line-height: 40px;
+			vertical-align: middle;
 		}
 	}
 }

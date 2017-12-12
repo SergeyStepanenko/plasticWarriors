@@ -4,16 +4,6 @@ body {
   overflow-x: hidden;
   font-family: sans-serif; }
 
-.app__header {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  height: 40px;
-  margin: 0 !important;
-  padding-left: 20px;
-  color: #fff;
-  background-color: #3973ab; }
-
 .app__map {
   width: 100%; }
   .app__map img {
@@ -25,8 +15,11 @@ body {
 
 .app__panel {
   display: flex; }
-  .app__panel > div {
-    flex-wrap: nowrap; }
+
+.app__block > div {
+  height: 40px;
+  line-height: 40px;
+  vertical-align: middle; }
 
 .panel .panel-heading,
 .panel .panel-body {

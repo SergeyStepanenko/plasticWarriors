@@ -38,13 +38,13 @@ body {
 }
 
 .row {
-	margin: 0;
+	margin: 0 !important;
 }
 // bootstrap styles reassignment
 
 // colorPicker reassignment
 .circle-picker {
+	// width: 380px !important;
 	margin-top: 10px;
-	width: 380px !important;
 }
 // colorPicker reassignment

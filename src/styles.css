@@ -26,8 +26,7 @@ body {
   padding-left: 30px; }
 
 .row {
-  margin: 0; }
+  margin: 0 !important; }
 
 .circle-picker {
-  margin-top: 10px;
-  width: 380px !important; }
+  margin-top: 10px; }

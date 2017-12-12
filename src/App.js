@@ -5,12 +5,14 @@ import 'bootstrap/dist/css/bootstrap-theme.css';
 import * as B from 'react-bootstrap';
 
 import { requestData, Promise_all } from './helpers';
-import mapImg from './maps/map_1.jpg';
+// import mapImg from './maps/map_1.jpg';
+import mapMoscow from './maps/moscow.jpg';
 import {
 	Modal,
 	WarriorForm,
 	Warriors,
 	Panel,
+	MapAddForm,
 } from './_blocks';
 
 const config = {
@@ -26,7 +28,8 @@ firebase.initializeApp(config);
 
 const CORS = 'https://cors-anywhere.herokuapp.com/';
 const database = firebase.database();
-const rootRef = database.ref('/');
+const unitsRef = database.ref('/units');
+const mapsRef = database.ref('/maps');
 
 const formInitialState = {
 	name: '',
@@ -41,11 +44,12 @@ export default class App extends PureComponent {
 		form: formInitialState,
 		firebaseData: {},
 		mappedWarriors: [],
+		mapUrl: 'https://preview.ibb.co/eJ8z0G/map_1_7a9f92a2.jpg',
 		geoData: {
-			north: 55.6631224066095,
-			south: 55.6537422837442,
-			east: 37.6337206363678,
-			west: 37.6171284914017,
+			north: 55.9237682742173,
+			south: 55.5634952742938,
+			east: 37.8509902954102,
+			west: 37.3441600799561,
 		},
 		positionedWarriors: [],
 		isTrackingDataLoading: true,
@@ -58,7 +62,7 @@ export default class App extends PureComponent {
 	}
 
 	componentDidMount() {
-		rootRef.on('value', (snap) => {
+		unitsRef.on('value', (snap) => {
 			this.setState({
 				firebaseData: snap.val()
 			}, () => {
@@ -114,18 +118,18 @@ export default class App extends PureComponent {
 		};
 
 		if (!key) {
-			firebase.database().ref('/').push().set(postData);
+			unitsRef.push().set(postData);
 		} else {
 			const updates = {};
 			updates[key] = postData;
 
-			firebase.database().ref().update(updates);
+			unitsRef.update(updates);
 		}
 
 	}
 
 	deleteDataFromFirebase = (key) => {
-		firebase.database().ref(`/${key}`).remove();
+		database.ref(`/units/${key}`).remove();
 	}
 
 	requestKidsTrackData = async (firebaseData) => {
@@ -151,6 +155,25 @@ export default class App extends PureComponent {
 				[field]: event.target.value
 			}
 		});
+	}
+
+	handleMapUpdate = ({ mapName, mapUrl, north, east, south, west }) => {
+		const postData = {
+			mapName, mapUrl, north, east, south, west,
+		};
+
+		this.setState({
+			mapName,
+			mapUrl,
+			geoData: {
+				north,
+				east,
+				south,
+				west,
+			}
+		});
+
+		mapsRef.push().set(postData);
 	}
 
 	handleColorPick = (color) => {
@@ -237,6 +260,7 @@ export default class App extends PureComponent {
 			isTrackingDataLoading,
 			modal,
 			keys,
+			// mapUrl,
 		} = this.state;
 
 		return (
@@ -252,7 +276,7 @@ export default class App extends PureComponent {
 				<B.Row>
 					<div className='app__map' ref={(r) => { this.$image = r; }}	>
 						<B.Image
-							src={mapImg}
+							src={mapMoscow /* mapImg */}
 							responsive
 						/>
 					</div>
@@ -270,6 +294,9 @@ export default class App extends PureComponent {
 					/>
 				</B.Row>
 				<B.Row>
+					<MapAddForm handleMapUpdate={this.handleMapUpdate} />
+				</B.Row>
+				<B.Row>
 					<B.Col>
 						<Panel
 							keys={keys}
@@ -281,12 +308,14 @@ export default class App extends PureComponent {
 					</B.Col>
 				</B.Row>
 				<B.Row>
-					<B.Button
-						onClick={this.requestAndHandleResponse}
-						disabled={isTrackingDataLoading}
-					>
-						{isTrackingDataLoading ? 'Обновляется' : 'Обновить карту'}
-					</B.Button>
+					<B.Col>
+						<B.Button
+							onClick={this.requestAndHandleResponse}
+							disabled={isTrackingDataLoading}
+						>
+							{isTrackingDataLoading ? 'Обновляется' : 'Обновить карту'}
+						</B.Button>
+					</B.Col>
 				</B.Row>
 			</div>
 		);

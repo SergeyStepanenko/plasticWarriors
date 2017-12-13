@@ -26,9 +26,10 @@ import * as B from 'react-bootstrap';
 
 export default class MapAddForm extends PureComponent {
 	static propTypes = {
-		handleMapUpdate: PropTypes.func.isRequired,
+		sendMapToFirebase: PropTypes.func.isRequired,
 		handleFormReset: PropTypes.func,
 		handleMapSelect: PropTypes.func,
+		mapsData: PropTypes.object,
 	}
 
 	state = {
@@ -100,7 +101,7 @@ export default class MapAddForm extends PureComponent {
 									value={form.west}
 								/>
 								<B.Button
-									onClick={() => this.props.handleMapUpdate(form)}
+									onClick={() => this.props.sendMapToFirebase(form)}
 									disabled={isFormCompleted}
 								>
 									Добавить
@@ -112,7 +113,7 @@ export default class MapAddForm extends PureComponent {
 						<B.FormGroup>
 							<B.ControlLabel>Выберите сохраненную карту</B.ControlLabel>
 							<B.FormControl componentClass='select' onChange={this.props.handleMapSelect}>
-								<MapsList maps={this.props.mapsData} />
+								<MapsList maps={mapsData} />
 							</B.FormControl>
 						</B.FormGroup>
 					</B.Col>

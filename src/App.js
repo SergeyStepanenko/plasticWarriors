@@ -5,8 +5,6 @@ import 'bootstrap/dist/css/bootstrap-theme.css';
 import * as B from 'react-bootstrap';
 
 import { requestData, Promise_all } from './helpers';
-// import mapImg from './maps/map_1.jpg';
-import mapMoscow from './maps/moscow.jpg';
 import {
 	Modal,
 	WarriorForm,
@@ -45,6 +43,7 @@ export default class App extends PureComponent {
 		form: formInitialState,
 		units: {},
 		mappedWarriors: [],
+		positionedWarriors: [],
 		map: {
 			name: 'Москва',
 			url: 'https://preview.ibb.co/ksLtAG/123.jpg',
@@ -53,7 +52,6 @@ export default class App extends PureComponent {
 			east: 37.8509902954102,
 			west: 37.3441600799561,
 		},
-		positionedWarriors: [],
 		isTrackingDataLoading: true,
 		modal: {
 			type: '',
@@ -89,7 +87,7 @@ export default class App extends PureComponent {
 	}
 
 	handleSubmit = (key) => {
-		this.sendDataToFirebase({
+		this.sendUnitToFirebase({
 			key,
 			name: this.state.form.name.trim(),
 			url: this.state.form.url.trim(),
@@ -114,7 +112,7 @@ export default class App extends PureComponent {
 		});
 	}
 
-	sendDataToFirebase = ({ key, name, url, color }) => {
+	sendUnitToFirebase = ({ key, name, url, color }) => {
 		const postData = {
 			name,
 			url,
@@ -132,7 +130,7 @@ export default class App extends PureComponent {
 
 	}
 
-	deleteDataFromFirebase = (key) => {
+	deleteUnitFromFirebase = (key) => {
 		database.ref(`/units/${key}`).remove();
 	}
 
@@ -162,7 +160,7 @@ export default class App extends PureComponent {
 		});
 	}
 
-	handleMapUpdate = (data) => {
+	sendMapToFirebase = (data) => {
 		mapsRef.push().set({ ...data });
 	}
 
@@ -239,7 +237,7 @@ export default class App extends PureComponent {
 				type: 'delete',
 				show: true,
 				key,
-				action: this.deleteDataFromFirebase,
+				action: this.deleteUnitFromFirebase,
 			},
 			form: formInitialState,
 		});
@@ -285,7 +283,10 @@ export default class App extends PureComponent {
 							responsive
 						/>
 					</div>
-					<Warriors shift={shiftYaxis} positionedWarriors={positionedWarriors}/>
+					<Warriors
+						shift={shiftYaxis}
+						positionedWarriors={positionedWarriors}
+					/>
 				</B.Row>
 				<B.Row>
 					<WarriorForm
@@ -298,7 +299,7 @@ export default class App extends PureComponent {
 				</B.Row>
 				<B.Row>
 					<MapAddForm
-						handleMapUpdate={this.handleMapUpdate}
+						sendMapToFirebase={this.sendMapToFirebase}
 						mapsData={maps}
 						handleMapSelect={this.handleMapSelect}
 					/>

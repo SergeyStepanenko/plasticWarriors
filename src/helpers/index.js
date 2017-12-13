@@ -1,7 +1,8 @@
 export const requestData = ({ CORS, url, key, ...rest }) => {
 	return new Promise((resolve, reject) => {
 		const xhr = new XMLHttpRequest();
-		const wrappedUrl = `${CORS}${url}&mode=poll`;
+		// const wrappedUrl = `${CORS}${url}&mode=poll`;
+		const wrappedUrl = `${url}&mode=poll`;
 
 		xhr.open('GET', wrappedUrl, true);
 		xhr.onload = function x() {

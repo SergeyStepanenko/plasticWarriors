@@ -46,7 +46,7 @@ export default class App extends PureComponent {
 		positionedWarriors: [],
 		map: {
 			name: 'Москва',
-			url: 'https://preview.ibb.co/ksLtAG/123.jpg',
+			url: 'https://img-fotki.yandex.ru/get/963734/57160272.c/0_1e0824_d5ae9308_orig.jpg',
 			north: 55.9237682742173,
 			south: 55.5634952742938,
 			east: 37.8509902954102,

@@ -76,7 +76,7 @@ export default class App extends PureComponent {
 
 				// this.interval = setInterval(() => {
 				// 	this.requestAndHandleResponse();
-				// }, 30000);
+				// }, 120000);
 			});
 		});
 

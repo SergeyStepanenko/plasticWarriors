@@ -4,6 +4,10 @@ body {
   overflow-x: hidden;
   font-family: sans-serif; }
 
+.app__header {
+  margin-bottom: 0px !important;
+  height: 40px !important; }
+
 .app__map {
   width: 100%; }
   .app__map img {
@@ -19,7 +23,8 @@ body {
 .app__block > div {
   height: 40px;
   line-height: 40px;
-  vertical-align: middle; }
+  vertical-align: middle;
+  white-space: nowrap; }
 
 .panel .panel-heading,
 .panel .panel-body {

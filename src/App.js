@@ -28,6 +28,7 @@ firebase.initializeApp(config);
 
 const CORS = 'https://cors-anywhere.herokuapp.com/';
 const database = firebase.database();
+const rootRef = database.ref('/');
 const unitsRef = database.ref('/units');
 const mapsRef = database.ref('/maps');
 
@@ -42,10 +43,11 @@ const formInitialState = {
 export default class App extends PureComponent {
 	state = {
 		form: formInitialState,
-		firebaseData: {},
+		units: {},
 		mappedWarriors: [],
-		mapUrl: 'https://preview.ibb.co/eJ8z0G/map_1_7a9f92a2.jpg',
-		geoData: {
+		map: {
+			name: 'Москва',
+			url: 'https://preview.ibb.co/ksLtAG/123.jpg',
 			north: 55.9237682742173,
 			south: 55.5634952742938,
 			east: 37.8509902954102,
@@ -62,26 +64,28 @@ export default class App extends PureComponent {
 	}
 
 	componentDidMount() {
-		unitsRef.on('value', (snap) => {
+		rootRef.on('value', (snap) => {
+			const data = snap.val();
+
 			this.setState({
-				firebaseData: snap.val()
+				units: data.units,
+				maps: data.maps,
 			}, () => {
-				this.setState({ isFirebaseDataLoading: false });
+				this.setState({ areUnitsLoading: false });
 				this.requestAndHandleResponse();
 
-				this.interval = setInterval(() => {
-					this.requestAndHandleResponse();
-				}, 30000);
+				// this.interval = setInterval(() => {
+				// 	this.requestAndHandleResponse();
+				// }, 30000);
 			});
 		});
 
-		window.addEventListener('resize', this.handleWindowsResize);
+		window.addEventListener('resize', this.recalculatePosition);
 	}
 
 	componentWillUnmount() {
 		clearInterval(this.interval);
-
-		window.removeEventListener('resize', this.handleWindowsResize);
+		window.removeEventListener('resize', this.recalculatePosition);
 	}
 
 	handleSubmit = (key) => {
@@ -101,7 +105,7 @@ export default class App extends PureComponent {
 		});
 	}
 
-	handleWindowsResize = () => {
+	recalculatePosition = () => {
 		const imgParams = this.$image.getBoundingClientRect();
 		this.paintWarriorsOnMap({ imgData: imgParams, warriors: this.state.mappedWarriors });
 
@@ -132,10 +136,10 @@ export default class App extends PureComponent {
 		database.ref(`/units/${key}`).remove();
 	}
 
-	requestKidsTrackData = async (firebaseData) => {
-		const keys = Object.keys(firebaseData);
+	requestKidsTrackData = async (units) => {
+		const keys = Object.keys(units);
 		const promises = [
-			...keys.map(key => requestData({ CORS, key, ...firebaseData[key] }))
+			...keys.map(key => requestData({ CORS, key, ...units[key] }))
 		];
 		const mappedWarriors = await Promise_all(promises);
 
@@ -143,6 +147,7 @@ export default class App extends PureComponent {
 			mappedWarriors,
 			keys
 		}, () => {
+			this.recalculatePosition();
 			return Promise.resolve(mappedWarriors);
 		});
 	};
@@ -157,23 +162,20 @@ export default class App extends PureComponent {
 		});
 	}
 
-	handleMapUpdate = ({ mapName, mapUrl, north, east, south, west }) => {
-		const postData = {
-			mapName, mapUrl, north, east, south, west,
-		};
+	handleMapUpdate = (data) => {
+		mapsRef.push().set({ ...data });
+	}
 
-		this.setState({
-			mapName,
-			mapUrl,
-			geoData: {
-				north,
-				east,
-				south,
-				west,
-			}
+	handleMapSelect = (event) => {
+		const mapId = event.target.value;
+		const { maps } = this.state;
+		const map = maps[mapId];
+
+		this.setState({ map }, () => {
+			setTimeout(() => {
+				this.recalculatePosition();
+			}, 100);
 		});
-
-		mapsRef.push().set(postData);
 	}
 
 	handleColorPick = (color) => {
@@ -186,18 +188,18 @@ export default class App extends PureComponent {
 	};
 
 	paintWarriorsOnMap = ({ imgData, warriors }) => {
-		const { geoData } = this.state;
-		const Xscale = imgData.width / (geoData.east - geoData.west); // количество пикселей в одном градусе долготы (3093/0,0166=186325)
-		const Yscale = imgData.height / (geoData.north - geoData.south);  // количество пикселей в одном градусе широты (3093/0,00938=329744)
+		const { map } = this.state;
+		const Xscale = imgData.width / (+map.east - +map.west); // количество пикселей в одном градусе долготы (3093/0,0166=186325)
+		const Yscale = imgData.height / (+map.north - +map.south);  // количество пикселей в одном градусе широты (3093/0,00938=329744)
 
 		const positionedWarriors = warriors.map((warrior) => {
-			const isInLngRange = warrior.lng > geoData.west && warrior.lng < geoData.east;
-			const isInlatRange = warrior.lat > geoData.south && warrior.lat < geoData.north;
+			const isInLngRange = +warrior.lng > +map.west && +warrior.lng < +map.east;
+			const isInlatRange = +warrior.lat > +map.south && +warrior.lat < +map.north;
 
 			return {
 				...warrior,
-				lngInPx: (warrior.lng - geoData.west) * Xscale,
-				ltdInPx: (geoData.north - warrior.lat) * Yscale,
+				lngInPx: (warrior.lng - map.west) * Xscale,
+				ltdInPx: (map.north - warrior.lat) * Yscale,
 				isInRange: isInLngRange && isInlatRange,
 			};
 		});
@@ -212,18 +214,17 @@ export default class App extends PureComponent {
 			imgParams: this.$image.getBoundingClientRect(),
 			isTrackingDataLoading: true,
 		}, async () => {
-			await this.requestKidsTrackData(this.state.firebaseData);
+			await this.requestKidsTrackData(this.state.units);
 			this.setState({ isTrackingDataLoading: false });
-			this.paintWarriorsOnMap({ imgData: this.state.imgParams, warriors: this.state.mappedWarriors });
 		});
 	}
 
-	editWarrior = ({ firebaseData, key }) => {
+	editWarrior = ({ units, key }) => {
 		this.setState({
 			form: {
-				name: firebaseData[key].name,
-				url: firebaseData[key].url,
-				color: firebaseData[key].color,
+				name: units[key].name,
+				url: units[key].url,
+				color: units[key].color,
 				key,
 				type: 'edit',
 			},
@@ -254,14 +255,17 @@ export default class App extends PureComponent {
 
 	render() {
 		const {
-			firebaseData,
+			units,
 			form,
 			positionedWarriors,
 			isTrackingDataLoading,
 			modal,
 			keys,
-			// mapUrl,
+			maps,
+			map,
 		} = this.state;
+
+		const shiftYaxis = '40px';
 
 		return (
 			<div>
@@ -273,16 +277,15 @@ export default class App extends PureComponent {
 							onHide={this.modalHide}
 						/>
 				}
+				<B.Panel style={{ height: shiftYaxis }} className='app__header' header={'Юнит-трекер'} bsStyle="primary"/>
 				<B.Row>
 					<div className='app__map' ref={(r) => { this.$image = r; }}	>
 						<B.Image
-							src={mapMoscow /* mapImg */}
+							src={map.url}
 							responsive
 						/>
 					</div>
-					<div className='app__warriors'>
-						<Warriors positionedWarriors={positionedWarriors}/>
-					</div>
+					<Warriors shift={shiftYaxis} positionedWarriors={positionedWarriors}/>
 				</B.Row>
 				<B.Row>
 					<WarriorForm
@@ -294,13 +297,17 @@ export default class App extends PureComponent {
 					/>
 				</B.Row>
 				<B.Row>
-					<MapAddForm handleMapUpdate={this.handleMapUpdate} />
+					<MapAddForm
+						handleMapUpdate={this.handleMapUpdate}
+						mapsData={maps}
+						handleMapSelect={this.handleMapSelect}
+					/>
 				</B.Row>
 				<B.Row>
 					<B.Col>
 						<Panel
 							keys={keys}
-							firebaseData={firebaseData}
+							units={units}
 							editWarrior={this.editWarrior}
 							deleteWarrior={this.deleteWarrior}
 							positionedWarriors={positionedWarriors}

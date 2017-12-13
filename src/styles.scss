@@ -7,6 +7,10 @@ body {
 
 
 .app {
+	&__header {
+		margin-bottom: 0px !important;
+		height: 40px !important;
+	}
 	&__map {
 		width: 100%;
 		img {
@@ -25,6 +29,7 @@ body {
 			height: 40px;
 			line-height: 40px;
 			vertical-align: middle;
+			white-space: nowrap;
 		}
 	}
 }

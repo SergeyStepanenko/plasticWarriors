@@ -28,17 +28,18 @@ export default class MapAddForm extends PureComponent {
 	static propTypes = {
 		handleMapUpdate: PropTypes.func.isRequired,
 		handleFormReset: PropTypes.func,
+		handleMapSelect: PropTypes.func,
 	}
 
 	state = {
 		form: {
-			mapName: '',
-			mapUrl: '',
+			name: '',
+			url: '',
 			north: '',
 			east: '',
 			south: '',
 			west: '',
-		}
+		},
 	}
 
 	handleFormChange = (field, event) => {
@@ -46,13 +47,14 @@ export default class MapAddForm extends PureComponent {
 		this.setState({
 			form: {
 				...this.state.form,
-				[field]: event.target.value
+				[field]: event.target.value,
 			}
 		});
 	}
 
 	render() {
 		const { form } = this.state;
+		const { mapsData } = this.props;
 		const isFormCompleted = !!~Object.values(form).indexOf('');
 
 		return (
@@ -64,13 +66,13 @@ export default class MapAddForm extends PureComponent {
 								<B.ControlLabel>Ссылка на карту</B.ControlLabel>
 								<B.FormControl
 									placeholder='Название карты'
-									onChange={(event) => this.handleFormChange('mapName', event)}
-									value={form.mapName}
+									onChange={(event) => this.handleFormChange('name', event)}
+									value={form.name}
 								/>
 								<B.FormControl
 									placeholder='Ссылка'
-									onChange={(event) => this.handleFormChange('mapUrl', event)}
-									value={form.mapUrl}
+									onChange={(event) => this.handleFormChange('url', event)}
+									value={form.url}
 								/>
 							</B.Col>
 						</B.FormGroup>
@@ -106,8 +108,32 @@ export default class MapAddForm extends PureComponent {
 							</B.Col>
 						</B.FormGroup>
 					</B.Col>
+					<B.Col md={4}>
+						<B.FormGroup>
+							<B.ControlLabel>Выберите сохраненную карту</B.ControlLabel>
+							<B.FormControl componentClass='select' onChange={this.props.handleMapSelect}>
+								<MapsList maps={this.props.mapsData} />
+							</B.FormControl>
+						</B.FormGroup>
+					</B.Col>
 				</B.Panel>
 			</B.Form>
 		);
 	}
 }
+
+const MapsList = ({ maps }) => {
+	if (!maps) {
+		return [];
+	}
+
+	return (
+		Object.keys(maps).map(key => {
+			return (
+				<option key={key} value={key}>
+					{maps[key].name}
+				</option>
+			);
+		})
+	);
+};

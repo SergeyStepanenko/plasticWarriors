@@ -45,13 +45,14 @@ export default class App extends PureComponent {
 		mappedWarriors: [],
 		positionedWarriors: [],
 		map: {
-			name: 'Москва',
-			url: 'https://img-fotki.yandex.ru/get/963734/57160272.c/0_1e0824_d5ae9308_orig.jpg',
-			north: 55.9237682742173,
-			south: 55.5634952742938,
-			east: 37.8509902954102,
-			west: 37.3441600799561,
+			name: '',
+			url: '',
+			north: 0,
+			south: 0,
+			east: 0,
+			west: 0,
 		},
+		selectedMapId: '',
 		isTrackingDataLoading: true,
 		modal: {
 			type: '',
@@ -65,9 +66,15 @@ export default class App extends PureComponent {
 		rootRef.on('value', (snap) => {
 			const data = snap.val();
 
+			const selectedMapId = localStorage.getItem('selectedMap');
+
 			this.setState({
 				units: data.units,
 				maps: data.maps,
+				selectedMapId,
+				map: {
+					...data.maps[selectedMapId || '-L0AjXER8To8hYfZfuAw'],
+				}
 			}, () => {
 				this.setState({ areUnitsLoading: false });
 				this.requestAndHandleResponse();
@@ -173,7 +180,11 @@ export default class App extends PureComponent {
 			setTimeout(() => {
 				this.recalculatePosition();
 			}, 500);
+
+			localStorage.setItem('selectedMap', mapId);
 		});
+
+
 	}
 
 	handleColorPick = (color) => {
@@ -261,6 +272,7 @@ export default class App extends PureComponent {
 			keys,
 			maps,
 			map,
+			selectedMapId,
 		} = this.state;
 
 		const shiftYaxis = '40px';
@@ -301,6 +313,7 @@ export default class App extends PureComponent {
 					<MapAddForm
 						sendMapToFirebase={this.sendMapToFirebase}
 						mapsData={maps}
+						selectedMapId={selectedMapId}
 						handleMapSelect={this.handleMapSelect}
 					/>
 				</B.Row>

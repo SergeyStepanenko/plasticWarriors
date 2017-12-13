@@ -30,6 +30,7 @@ export default class MapAddForm extends PureComponent {
 		handleFormReset: PropTypes.func,
 		handleMapSelect: PropTypes.func,
 		mapsData: PropTypes.object,
+		selectedMapId: PropTypes.string,
 	}
 
 	state = {
@@ -55,7 +56,7 @@ export default class MapAddForm extends PureComponent {
 
 	render() {
 		const { form } = this.state;
-		const { mapsData } = this.props;
+		const { mapsData, selectedMapId } = this.props;
 		const isFormCompleted = !!~Object.values(form).indexOf('');
 
 		return (
@@ -113,7 +114,7 @@ export default class MapAddForm extends PureComponent {
 						<B.FormGroup>
 							<B.ControlLabel>Выберите сохраненную карту</B.ControlLabel>
 							<B.FormControl componentClass='select' onChange={this.props.handleMapSelect}>
-								<MapsList maps={mapsData} />
+								<MapsList maps={mapsData} selected={selectedMapId}/>
 							</B.FormControl>
 						</B.FormGroup>
 					</B.Col>
@@ -123,7 +124,7 @@ export default class MapAddForm extends PureComponent {
 	}
 }
 
-const MapsList = ({ maps }) => {
+const MapsList = ({ maps, selected }) => {
 	if (!maps) {
 		return [];
 	}
@@ -131,7 +132,7 @@ const MapsList = ({ maps }) => {
 	return (
 		Object.keys(maps).map(key => {
 			return (
-				<option key={key} value={key}>
+				<option key={key} value={key} selected={selected === key}>
 					{maps[key].name}
 				</option>
 			);

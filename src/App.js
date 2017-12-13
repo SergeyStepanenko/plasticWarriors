@@ -72,9 +72,9 @@ export default class App extends PureComponent {
 				this.setState({ areUnitsLoading: false });
 				this.requestAndHandleResponse();
 
-				// this.interval = setInterval(() => {
-				// 	this.requestAndHandleResponse();
-				// }, 120000);
+				this.interval = setInterval(() => {
+					this.requestAndHandleResponse();
+				}, 120000);
 			});
 		});
 
@@ -325,6 +325,7 @@ export default class App extends PureComponent {
 						</B.Button>
 					</B.Col>
 				</B.Row>
+				TEST 19:02
 			</div>
 		);
 	}

@@ -18,7 +18,7 @@ const config = {
 	databaseURL: 'https://plastic-warriors.firebaseio.com',
 	projectId: 'plastic-warriors',
 	storageBucket: '',
-	messagingSenderId: '143541315246'
+	messagingSenderId: '143541315246',
 };
 
 firebase.initializeApp(config);
@@ -68,8 +68,6 @@ export default class App extends PureComponent {
 	componentWillMount() {
 		firebase.auth().onAuthStateChanged((user) => {
 			if (user) {
-			// User is signed in.
-
 				const {
 					displayName,
 					email,
@@ -150,18 +148,10 @@ export default class App extends PureComponent {
 		if (event) {
 			event.preventDefault();
 		}
+
 		firebase.auth().signInWithRedirect(provider);
 
 		firebase.auth().getRedirectResult().then((result) => {
-			if (result.credential) {
-			// This gives you a Google Access Token. You can use it to access the Google API.
-				const token = result.credential.accessToken;
-				// localStorage.setItem('Token', token);
-			// ...
-			}
-			// The signed-in user info.
-			const user = result.user;
-
 			this.setState({
 				authentication: {
 					authenticated: true,
@@ -170,15 +160,6 @@ export default class App extends PureComponent {
 			});
 
 		}).catch((error) => {
-			// // Handle Errors here.
-			// const errorCode = error.code;
-			// const errorMessage = error.message;
-			// // The email of the user's account used.
-			// const email = error.email;
-			// // The firebase.auth.AuthCredential type that was used.
-			// const credential = error.credential;
-			// // ...
-
 			this.setState({
 				authentication: {
 					authenticated: false,

@@ -67,7 +67,7 @@ export default class Panel extends PureComponent {
 											<div>{warrior.isInRange ? 'На карте' : 'Вне карты'}</div>
 										</B.Col>
 										<B.Col sm={3}>
-											<div>{new Date(warrior.time).toLocaleString()}</div>
+											<div>{`${new Date(warrior.time).getHours()}:${new Date(warrior.time).getMinutes()}`}</div>
 										</B.Col>
 									</div>
 							))

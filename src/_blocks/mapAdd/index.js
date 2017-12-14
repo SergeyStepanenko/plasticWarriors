@@ -113,7 +113,11 @@ export default class MapAddForm extends PureComponent {
 					<B.Col md={4}>
 						<B.FormGroup>
 							<B.ControlLabel>Выберите сохраненную карту</B.ControlLabel>
-							<B.FormControl componentClass='select' onChange={this.props.handleMapSelect}>
+							<B.FormControl
+								componentClass='select'
+								value={selectedMapId}
+								onChange={this.props.handleMapSelect}
+							>
 								<MapsList maps={mapsData} selected={selectedMapId}/>
 							</B.FormControl>
 						</B.FormGroup>
@@ -124,7 +128,7 @@ export default class MapAddForm extends PureComponent {
 	}
 }
 
-const MapsList = ({ maps, selected }) => {
+const MapsList = ({ maps }) => {
 	if (!maps) {
 		return [];
 	}
@@ -132,7 +136,7 @@ const MapsList = ({ maps, selected }) => {
 	return (
 		Object.keys(maps).map(key => {
 			return (
-				<option key={key} value={key} selected={selected === key}>
+				<option key={key} value={key}>
 					{maps[key].name}
 				</option>
 			);

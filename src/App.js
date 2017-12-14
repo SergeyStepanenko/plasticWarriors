@@ -3,7 +3,6 @@ import * as firebase from 'firebase';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/css/bootstrap-theme.css';
 import * as B from 'react-bootstrap';
-
 import { requestData, Promise_all } from './helpers';
 import {
 	Modal,
@@ -23,13 +22,14 @@ const config = {
 };
 
 firebase.initializeApp(config);
+firebase.auth().languageCode = 'ru';
 
+const provider = new firebase.auth.GoogleAuthProvider();
 const CORS = 'https://cors-anywhere.herokuapp.com/';
 const database = firebase.database();
 const rootRef = database.ref('/');
 const unitsRef = database.ref('/units');
 const mapsRef = database.ref('/maps');
-
 const formInitialState = {
 	name: '',
 	url: '',
@@ -40,6 +40,9 @@ const formInitialState = {
 
 export default class App extends PureComponent {
 	state = {
+		authentication: {
+			authenticated: false,
+		},
 		form: formInitialState,
 		units: {},
 		mappedWarriors: [],
@@ -60,6 +63,59 @@ export default class App extends PureComponent {
 		imgParams: {
 			height: 0,
 		},
+	}
+
+	componentWillMount() {
+		firebase.auth().onAuthStateChanged((user) => {
+			if (user) {
+			// User is signed in.
+
+				const {
+					displayName,
+					email,
+					emailVerified,
+					photoURL,
+					uid,
+					phoneNumber,
+					providerData,
+				} = user;
+
+				user.getIdToken().then((accessToken) => {
+					this.setState({
+						authentication: {
+							authenticated: true,
+							displayName,
+							email,
+							emailVerified,
+							photoURL,
+							uid,
+							phoneNumber,
+							providerData,
+						}
+					});
+
+					console.table([{
+						displayName: displayName,
+						email: email,
+						emailVerified: emailVerified,
+						phoneNumber: phoneNumber,
+						photoURL: photoURL,
+						uid: uid,
+						accessToken: accessToken,
+						providerData: providerData
+					}]);
+				});
+			} else {
+			// User is signed out.
+				console.table([{
+					user: 'Signed out'
+				}]);
+
+				// this.signIn();
+			}
+		}, (error) => {
+			console.log(error);
+		});
 	}
 
 	componentDidMount() {
@@ -91,6 +147,57 @@ export default class App extends PureComponent {
 	componentWillUnmount() {
 		clearInterval(this.interval);
 		window.removeEventListener('resize', this.recalculatePosition);
+	}
+
+	signIn = (event) => {
+		if (event) {
+			event.preventDefault();
+		}
+		firebase.auth().signInWithRedirect(provider);
+
+		firebase.auth().getRedirectResult().then((result) => {
+			if (result.credential) {
+			// This gives you a Google Access Token. You can use it to access the Google API.
+				const token = result.credential.accessToken;
+				// localStorage.setItem('Token', token);
+			// ...
+			}
+			// The signed-in user info.
+			const user = result.user;
+
+			this.setState({
+				authentication: {
+					authenticated: true,
+					...result,
+				}
+			});
+
+		}).catch((error) => {
+			// // Handle Errors here.
+			// const errorCode = error.code;
+			// const errorMessage = error.message;
+			// // The email of the user's account used.
+			// const email = error.email;
+			// // The firebase.auth.AuthCredential type that was used.
+			// const credential = error.credential;
+			// // ...
+
+			this.setState({
+				authentication: {
+					authenticated: false,
+					...error,
+				}
+			});
+		});
+	}
+
+	signOut = (event) => {
+		event.preventDefault();
+		firebase.auth().signOut().then(function() {
+			console.log('Sign-out successful') // eslint-disable-line
+		}).catch(function(error) {
+			console.log('An error happened', error) // eslint-disable-line
+		});
 	}
 
 	handleSubmit = (key) => {
@@ -176,7 +283,10 @@ export default class App extends PureComponent {
 		const { maps } = this.state;
 		const map = maps[mapId];
 
-		this.setState({ map }, () => {
+		this.setState({
+			map,
+			selectedMapId: mapId,
+		}, () => {
 			setTimeout(() => {
 				this.recalculatePosition();
 			}, 500);
@@ -273,6 +383,7 @@ export default class App extends PureComponent {
 			maps,
 			map,
 			selectedMapId,
+			authentication,
 		} = this.state;
 
 		const shiftYaxis = '40px';
@@ -336,6 +447,16 @@ export default class App extends PureComponent {
 						>
 							{isTrackingDataLoading ? 'Обновляется' : 'Обновить карту'}
 						</B.Button>
+					</B.Col>
+				</B.Row>
+				<B.Row>
+					<B.Col>
+						<B.Button onClick={this.signIn} disabled={authentication.authenticated}>Войти</B.Button>
+					</B.Col>
+				</B.Row>
+				<B.Row>
+					<B.Col>
+						<B.Button onClick={this.signOut} disabled={!authentication.authenticated}>Выйти</B.Button>
 					</B.Col>
 				</B.Row>
 			</div>

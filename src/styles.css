@@ -26,10 +26,6 @@ body {
   vertical-align: middle;
   white-space: nowrap; }
 
-.panel .panel-heading,
-.panel .panel-body {
-  padding-left: 30px; }
-
 .row {
   margin: 0 !important; }
 

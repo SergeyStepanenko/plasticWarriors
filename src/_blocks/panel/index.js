@@ -9,10 +9,11 @@ export default class Panel extends PureComponent {
 		positionedWarriors: PropTypes.array.isRequired,
 		editWarrior: PropTypes.func.isRequired,
 		deleteWarrior: PropTypes.func.isRequired,
+		admin: PropTypes.bool,
 	}
 
 	render() {
-		const { units, positionedWarriors } = this.props;
+		const { units, positionedWarriors, admin } = this.props;
 
 		return (
 			<B.Panel header={'Пластиковые воины:'} bsStyle="primary">
@@ -22,7 +23,7 @@ export default class Panel extends PureComponent {
 							Object.keys(units).map((key) => {
 								return(
 									<div key={key} className='app__block'>
-										<B.Col sm={3}>{units[key].name}</B.Col>
+										<div className='app__block-name'>{units[key].name}</div>
 										<B.Col sm={1}>
 											<PinSVG
 												color={units[key].color}
@@ -30,16 +31,22 @@ export default class Panel extends PureComponent {
 												height='15px'
 											/>
 										</B.Col>
-										<B.Col sm={3}>
-											<B.Button onClick={() => this.props.editWarrior({ units, key })}>
-												Изменить
-											</B.Button>
-										</B.Col>
-										<B.Col sm={3}>
-											<B.Button onClick={() => this.props.deleteWarrior(key)}>
-												Удалить
-											</B.Button>
-										</B.Col>
+										{
+											admin &&
+												<B.Col sm={3}>
+													<B.Button onClick={() => this.props.editWarrior({ units, key })}>
+														Изменить
+													</B.Button>
+												</B.Col>
+										}
+										{
+											admin &&
+												<B.Col sm={3}>
+													<B.Button onClick={() => this.props.deleteWarrior(key)}>
+														Удалить
+													</B.Button>
+												</B.Col>
+										}
 									</div>
 								);
 							})

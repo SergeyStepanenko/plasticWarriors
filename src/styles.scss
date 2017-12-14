@@ -7,7 +7,7 @@ body {
 
 
 .app {
-	// min-width: 768px;
+	min-width: 768px;
 	&__header {
 		display: flex;
 		justify-content: space-between;
@@ -39,6 +39,11 @@ body {
 		display: flex;
 	}
 	&__block {
+		display: flex;
+		flex-flow: row;
+		&-name {
+			width: 80px;
+		}
 		> div {
 			height: 40px;
 			line-height: 40px;
@@ -63,7 +68,6 @@ body {
 
 // colorPicker reassignment
 .circle-picker {
-	// width: 380px !important;
 	margin-top: 10px;
 }
 // colorPicker reassignment

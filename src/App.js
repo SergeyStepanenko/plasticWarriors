@@ -11,7 +11,7 @@ import {
 	Panel,
 	MapAddForm,
 } from './_blocks';
-
+import { premissionRequest } from './config/roles';
 const config = {
 	apiKey: 'AIzaSyCB1TfuGQegOrHOPcFJFqpxDmMTSElXQVg',
 	authDomain: 'plastic-warriors.firebaseapp.com',
@@ -81,6 +81,7 @@ export default class App extends PureComponent {
 				user.getIdToken().then((accessToken) => {
 					this.setState({
 						authentication: {
+							admin: premissionRequest(email),
 							authenticated: true,
 							displayName,
 							email,
@@ -174,6 +175,7 @@ export default class App extends PureComponent {
 		firebase.auth().signOut().then(() => {
 			this.setState({
 				authentication: {
+					admin: false,
 					authenticated: false,
 				}
 			});
@@ -369,18 +371,15 @@ export default class App extends PureComponent {
 		} = this.state;
 		const shiftYaxis = '40px';
 
-		const { authenticated } = this.state.authentication;
+		const { authenticated, admin } = this.state.authentication;
 
 		return (
 			<div className='app'>
-				{
-					modal.show &&
-						<Modal
-							config={modal}
-							show
-							onHide={this.modalHide}
-						/>
-				}
+				<Modal
+					config={modal}
+					show={modal.show}
+					onHide={this.modalHide}
+				/>
 				<div style={{ height: shiftYaxis }} className='app__header'>
 					<div className='app__header-lable'>Трекер</div>
 					<div className='app__header-buttons'>
@@ -430,6 +429,7 @@ export default class App extends PureComponent {
 				<B.Row>
 					<B.Col>
 						<Panel
+							admin={admin}
 							keys={keys}
 							units={units}
 							editWarrior={this.editWarrior}

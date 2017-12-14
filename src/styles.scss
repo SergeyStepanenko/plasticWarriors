@@ -1,15 +1,29 @@
 body {
 	margin: 0;
 	padding: 0;
-	overflow-x: hidden;
+	// overflow-x: hidden;
 	font-family: sans-serif;
 }
 
 
 .app {
+	// min-width: 768px;
 	&__header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		flex-wrap: nowrap;
 		margin-bottom: 0px !important;
 		height: 40px !important;
+		background-image: linear-gradient(to bottom, #337ab7 0%, #2e6da4 100%);
+		&-lable {
+			color: #fff;
+			margin-left: 15px;
+		}
+		&-buttons {
+			display: flex;
+			flex-wrap: nowrap;
+		}
 	}
 	&__map {
 		width: 100%;

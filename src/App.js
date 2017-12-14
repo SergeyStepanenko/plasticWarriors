@@ -94,7 +94,7 @@ export default class App extends PureComponent {
 						}
 					});
 
-					console.table([{
+					console.table([{ // eslint-disable-line
 						displayName: displayName,
 						email: email,
 						emailVerified: emailVerified,
@@ -106,15 +106,12 @@ export default class App extends PureComponent {
 					}]);
 				});
 			} else {
-			// User is signed out.
-				console.table([{
+				console.table([{ // eslint-disable-line
 					user: 'Signed out'
 				}]);
-
-				// this.signIn();
 			}
 		}, (error) => {
-			console.log(error);
+			console.log(error); // eslint-disable-line
 		});
 	}
 
@@ -193,9 +190,14 @@ export default class App extends PureComponent {
 
 	signOut = (event) => {
 		event.preventDefault();
-		firebase.auth().signOut().then(function() {
+		firebase.auth().signOut().then(() => {
+			this.setState({
+				authentication: {
+					authenticated: false,
+				}
+			});
 			console.log('Sign-out successful') // eslint-disable-line
-		}).catch(function(error) {
+		}).catch((error) => {
 			console.log('An error happened', error) // eslint-disable-line
 		});
 	}
@@ -383,13 +385,13 @@ export default class App extends PureComponent {
 			maps,
 			map,
 			selectedMapId,
-			authentication,
 		} = this.state;
-
 		const shiftYaxis = '40px';
 
+		const { authenticated } = this.state.authentication;
+
 		return (
-			<div>
+			<div className='app'>
 				{
 					modal.show &&
 						<Modal
@@ -398,7 +400,23 @@ export default class App extends PureComponent {
 							onHide={this.modalHide}
 						/>
 				}
-				<B.Panel style={{ height: shiftYaxis }} className='app__header' header={'Юнит-трекер'} bsStyle="primary"/>
+				<div style={{ height: shiftYaxis }} className='app__header'>
+					<div className='app__header-lable'>Трекер</div>
+					<div className='app__header-buttons'>
+						<B.Button onClick={this.signIn} disabled={authenticated}>
+							Войти
+						</B.Button>
+						<B.Button onClick={this.signOut} disabled={!authenticated}>
+							Выйти
+						</B.Button>
+						<B.Button
+							onClick={this.requestAndHandleResponse}
+							disabled={isTrackingDataLoading}
+						>
+							{isTrackingDataLoading ? 'Обновляется' : 'Обновить карту'}
+						</B.Button>
+					</div>
+				</div>
 				<B.Row>
 					<div className='app__map' ref={(r) => { this.$image = r; }}	>
 						<B.Image
@@ -437,26 +455,6 @@ export default class App extends PureComponent {
 							deleteWarrior={this.deleteWarrior}
 							positionedWarriors={positionedWarriors}
 						/>
-					</B.Col>
-				</B.Row>
-				<B.Row>
-					<B.Col>
-						<B.Button
-							onClick={this.requestAndHandleResponse}
-							disabled={isTrackingDataLoading}
-						>
-							{isTrackingDataLoading ? 'Обновляется' : 'Обновить карту'}
-						</B.Button>
-					</B.Col>
-				</B.Row>
-				<B.Row>
-					<B.Col>
-						<B.Button onClick={this.signIn} disabled={authentication.authenticated}>Войти</B.Button>
-					</B.Col>
-				</B.Row>
-				<B.Row>
-					<B.Col>
-						<B.Button onClick={this.signOut} disabled={!authentication.authenticated}>Выйти</B.Button>
 					</B.Col>
 				</B.Row>
 			</div>

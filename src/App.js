@@ -90,24 +90,12 @@ export default class App extends PureComponent {
 							uid,
 							phoneNumber,
 							providerData,
+							accessToken,
 						}
 					});
-
-					console.table([{ // eslint-disable-line
-						displayName: displayName,
-						email: email,
-						emailVerified: emailVerified,
-						phoneNumber: phoneNumber,
-						photoURL: photoURL,
-						uid: uid,
-						accessToken: accessToken,
-						providerData: providerData
-					}]);
 				});
 			} else {
-				console.table([{ // eslint-disable-line
-					user: 'Signed out'
-				}]);
+				console.log('Signed out'); // eslint-disable-line
 			}
 		}, (error) => {
 			console.log(error); // eslint-disable-line
@@ -319,7 +307,9 @@ export default class App extends PureComponent {
 			isTrackingDataLoading: true,
 		}, async () => {
 			await this.requestKidsTrackData(this.state.units);
-			this.setState({ isTrackingDataLoading: false });
+			this.setState({
+				isTrackingDataLoading: false,
+			});
 		});
 	}
 

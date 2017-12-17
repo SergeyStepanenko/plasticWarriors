@@ -351,7 +351,7 @@ export default class App extends PureComponent {
 
 	resize = (flag) => {
 		const { iconSize } = this.state;
-		const step = 5;
+		const step = 2;
 		let size = iconSize;
 
 		switch (flag) {

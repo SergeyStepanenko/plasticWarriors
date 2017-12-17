@@ -5,6 +5,10 @@ body {
 	font-family: sans-serif;
 }
 
+td {
+    padding: 2px 5px !important;
+}
+
 
 .app {
 	min-width: 1024px;
@@ -37,6 +41,12 @@ body {
 	}
 	&__panel {
 		display: flex;
+		&-status {
+			color: red;
+		}
+		div {
+			white-space: nowrap;
+		}
 	}
 	&__block {
 		display: flex;

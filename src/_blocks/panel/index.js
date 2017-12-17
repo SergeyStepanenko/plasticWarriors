@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import * as B from 'react-bootstrap';
-import { PinSVG } from '../index';
+import { PinSVG2 } from '../index';
 
 export default class Panel extends PureComponent {
 	static propTypes = {
@@ -22,10 +22,18 @@ export default class Panel extends PureComponent {
 		}
 
 		const minutes = (Date.now() - milliseconds) / 1000 / 60;
-		const seconds = minutes < 1 ? Math.round(minutes * 60) : false;
 
+		return minutes;
+	}
 
-		return minutes < 1 ? seconds : Math.round(minutes);
+	getStatus = ({ isInRange, timeAgo }) => {
+		if (isInRange !== undefined && !isInRange) {
+			return 'Вне карты';
+		}
+
+		if (timeAgo > 5) {
+			return 'Оффлайн';
+		}
 	}
 
 	render() {
@@ -39,31 +47,48 @@ export default class Panel extends PureComponent {
 
 		return (
 			<div>
-				<B.Panel header={`Статистика: Всего - ${fbArray.length}`} bsStyle="primary">
+				<B.Panel header={`Статистика: всего - ${fbArray.length}`} bsStyle="primary">
 					<B.FormGroup className='app__panel'>
 						<table>
+							<thead>
+								<tr>
+									<td></td>
+									<td>Имя</td>
+									<td>Время</td>
+									<td>Заряд</td>
+									<td>Точность</td>
+									<td>Статус</td>
+									<td></td>
+									<td></td>
+								</tr>
+							</thead>
 							<tbody>
 								{
 									fbArray.map((warrior) => {
 										const timeAgo = this.getMinutesAgo(warrior.time);
-										const status = timeAgo > 5 && 'Оффлайн';
 										const accuracy = warrior.acc && `${warrior.acc}m` || LOADING;
 										const batteryLevel = warrior.batteryLvl && `${warrior.batteryLvl}%` || LOADING;
-										const timeAgoString = timeAgo && (timeAgo > 1 ? `${timeAgo}мин` : '<1мин') || LOADING;
+										const timeAgoString = timeAgo && (timeAgo > 1 ? `${Math.round(timeAgo)}мин` : '<1мин') || LOADING;
+										const status = this.getStatus({ isInRange: warrior.isInRange, timeAgo });
+										const style = {
+											batteryLevel: warrior.batteryLvl < 33 ? 'app__panel-red' : '',
+											accuracy: warrior.acc > 25 ? 'app__panel-red' : '',
+											timeAgo: timeAgo > 5 ? 'app__panel-red' : '',
+										};
 
 										return (
 											<tr key={warrior.url}>
 												<td>
-													<PinSVG
+													<PinSVG2
 														color={warrior.color}
 														width='15px'
 														height='15px'
 													/>
 												</td>
 												<td>{warrior.name || LOADING}</td>
-												<td>{timeAgoString}</td>
-												<td>{batteryLevel}</td>
-												<td>{accuracy}</td>
+												<td className={style.timeAgo}>{timeAgoString}</td>
+												<td className={style.batteryLevel}>{batteryLevel}</td>
+												<td className={style.accuracy}>{accuracy}</td>
 												<td className='app__panel-status'>{status}</td>
 												<td>
 													<a href={warrior.url} target='_blank'>Ссылка</a>

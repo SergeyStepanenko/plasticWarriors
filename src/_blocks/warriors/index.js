@@ -2,26 +2,30 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import * as B from 'react-bootstrap';
 
-import PinSVG from '../pin';
+import { PinSVG2 } from '../index';
 
 export default class Warriors extends PureComponent {
+	static defaultProps = {
+		iconSize: 15,
+	}
+
 	static propTypes = {
 		positionedWarriors: PropTypes.array,
 		shift: PropTypes.string.isRequired,
+		iconSize: PropTypes.number,
 	}
 
 	render() {
+		const { iconSize, positionedWarriors } = this.props;
 		return (
 			<div className='app__warriors'>
 				{
-					this.props.positionedWarriors.map((warrior) => {
-						const iconWidth = 15;
-						const iconHeight = 15;
-						const shiftOnMap = `translate(${warrior.lngInPx - iconWidth / 2}px, ${warrior.ltdInPx - iconHeight / 2}px)`;
+					positionedWarriors.sort((a, b) => a.color > b.color).map((warrior) => {
+						const shiftOnMap = `translate(${warrior.lngInPx - iconSize / 2}px, ${warrior.ltdInPx - iconSize / 2}px)`;
 						const pinStyles = {
 							position: 'absolute',
-							width: `${iconWidth}px`,
-							height: `${iconHeight}px`,
+							width: `${iconSize}px`,
+							height: `${iconSize}px`,
 							transform: shiftOnMap,
 							marginTop: this.props.shift, // shift as per header height
 						};
@@ -46,7 +50,7 @@ export default class Warriors extends PureComponent {
 									warrior.isInRange &&
 										<B.OverlayTrigger id={warrior.key} overlay={tooltip}>
 											<div style={pinStyles}>
-												<PinSVG color={warrior.color} />
+												<PinSVG2 color={warrior.color} />
 											</div>
 										</B.OverlayTrigger>
 								}

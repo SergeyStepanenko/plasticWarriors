@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-export default function PinSVG({ width = '100%', height = '100%', color }) {
+export function PinSVG({ width = '100%', height = '100%', color }) {
 	return (
 		<svg xmlns="http://www.w3.org/2000/svg" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 426.667 426.667" width={width} height={height}>
 			<g>
@@ -13,6 +13,32 @@ export default function PinSVG({ width = '100%', height = '100%', color }) {
 }
 
 PinSVG.propTypes = {
+	width: PropTypes.string,
+	height: PropTypes.string,
+	color: PropTypes.string,
+};
+
+export function PinSVG2({ width = '100%', height = '100%', color }) {
+	return (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			xmlSpace="preserve"
+			width={width}
+			height={height}
+			version="1.1"
+			viewBox="0 0 113 113"
+			xmlnsXlink="http://www.w3.org/1999/xlink"
+		>
+			<g id="Layer_x0020_1">
+				<circle fill="black" cx="56" cy="56" r="56"/>
+				<circle fill="white" cx="56" cy="56" r="48"/>
+				<circle fill={color} cx="56" cy="56" r="37"/>
+			</g>
+		</svg>
+	);
+}
+
+PinSVG2.propTypes = {
 	width: PropTypes.string,
 	height: PropTypes.string,
 	color: PropTypes.string,

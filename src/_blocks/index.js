@@ -2,7 +2,7 @@ import Modal from './modal';
 import WarriorForm from './form';
 import Warriors from './warriors';
 import Panel from './panel';
-import PinSVG from './pin';
+import { PinSVG, PinSVG2 } from './pin';
 import MapAddForm from './mapAdd';
 
 export {
@@ -11,5 +11,6 @@ export {
 	Warriors,
 	Panel,
 	PinSVG,
+	PinSVG2,
 	MapAddForm,
 };

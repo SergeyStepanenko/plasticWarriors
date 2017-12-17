@@ -26,6 +26,7 @@ firebase.auth().languageCode = 'ru';
 
 const provider = new firebase.auth.GoogleAuthProvider();
 const CORS = 'https://cors-anywhere.herokuapp.com/';
+const ICONSIZE = 15;
 const database = firebase.database();
 const rootRef = database.ref('/');
 const unitsRef = database.ref('/units');
@@ -63,6 +64,7 @@ export default class App extends PureComponent {
 		imgParams: {
 			height: 0,
 		},
+		iconSize: ICONSIZE,
 	}
 
 	componentWillMount() {
@@ -347,6 +349,25 @@ export default class App extends PureComponent {
 		});
 	}
 
+	resize = (flag) => {
+		const { iconSize } = this.state;
+		const step = 5;
+		let size = iconSize;
+
+		switch (flag) {
+		case '+': size += step;
+			break;
+		case '-': size -= step;
+			break;
+		default:
+			size = ICONSIZE;
+		}
+
+		this.setState({
+			iconSize: size,
+		});
+	}
+
 	render() {
 		const {
 			units,
@@ -358,6 +379,7 @@ export default class App extends PureComponent {
 			maps,
 			map,
 			selectedMapId,
+			iconSize,
 		} = this.state;
 		const shiftYaxis = '40px';
 
@@ -371,7 +393,12 @@ export default class App extends PureComponent {
 					onHide={this.modalHide}
 				/>
 				<div style={{ height: shiftYaxis }} className='app__header'>
-					<div className='app__header-lable'>Трекер</div>
+					<div className='app__header-lable'>
+						Трекер
+						<B.Button onClick={() => this.resize('+')}>+</B.Button>
+						<B.Button onClick={this.resize}>0</B.Button>
+						<B.Button onClick={() => this.resize('-')}>-</B.Button>
+					</div>
 					<div className='app__header-buttons'>
 						<B.Button onClick={this.signIn} disabled={authenticated}>
 							Войти
@@ -397,7 +424,20 @@ export default class App extends PureComponent {
 					<Warriors
 						shift={shiftYaxis}
 						positionedWarriors={positionedWarriors}
+						iconSize={iconSize}
 					/>
+				</B.Row>
+				<B.Row>
+					<B.Col>
+						<Panel
+							admin={admin}
+							keys={keys}
+							units={units}
+							editWarrior={this.editWarrior}
+							deleteWarrior={this.deleteWarrior}
+							positionedWarriors={positionedWarriors}
+						/>
+					</B.Col>
 				</B.Row>
 				<B.Row>
 					<WarriorForm
@@ -415,18 +455,6 @@ export default class App extends PureComponent {
 						selectedMapId={selectedMapId}
 						handleMapSelect={this.handleMapSelect}
 					/>
-				</B.Row>
-				<B.Row>
-					<B.Col>
-						<Panel
-							admin={admin}
-							keys={keys}
-							units={units}
-							editWarrior={this.editWarrior}
-							deleteWarrior={this.deleteWarrior}
-							positionedWarriors={positionedWarriors}
-						/>
-					</B.Col>
 				</B.Row>
 			</div>
 		);

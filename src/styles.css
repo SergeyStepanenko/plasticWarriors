@@ -4,7 +4,7 @@ body {
   font-family: sans-serif; }
 
 td {
-  padding: 2px 5px !important; }
+  padding: 2px 10px !important; }
 
 .app {
   min-width: 1024px; }
@@ -19,6 +19,8 @@ td {
     .app__header-lable {
       color: #fff;
       margin-left: 15px; }
+      .app__header-lable button {
+        margin: 0 10px; }
     .app__header-buttons {
       display: flex;
       flex-wrap: nowrap; }
@@ -30,8 +32,11 @@ td {
     position: absolute;
     top: 0px; }
   .app__panel {
-    display: flex; }
+    display: flex;
+    margin-left: 15px; }
     .app__panel-status {
+      color: red; }
+    .app__panel-red {
       color: red; }
     .app__panel div {
       white-space: nowrap; }

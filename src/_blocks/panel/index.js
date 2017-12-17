@@ -30,7 +30,7 @@ export default class Panel extends PureComponent {
 
 	render() {
 		const { units, positionedWarriors, admin } = this.props;
-		const LOADING = 'loading';
+		const LOADING = 'загружается';
 		let fbArray = Object.keys(units).map(value => ({ ...units[value] }));
 
 		if (positionedWarriors.length) {
@@ -49,7 +49,7 @@ export default class Panel extends PureComponent {
 										const status = timeAgo > 5 && 'Оффлайн';
 										const accuracy = warrior.acc && `${warrior.acc}m` || LOADING;
 										const batteryLevel = warrior.batteryLvl && `${warrior.batteryLvl}%` || LOADING;
-										const timeAgoString = timeAgo > 1 ? `${timeAgo}мин` : '<1мин';
+										const timeAgoString = timeAgo && (timeAgo > 1 ? `${timeAgo}мин` : '<1мин') || LOADING;
 
 										return (
 											<tr key={warrior.url}>

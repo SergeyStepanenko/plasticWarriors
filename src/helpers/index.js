@@ -6,12 +6,20 @@ export const requestData = ({ CORS, url, key, ...rest }) => {
 		xhr.open('GET', wrappedUrl, true);
 		xhr.onload = function x() {
 			if (this.status === 200) {
-				resolve({
-					...JSON.parse(this.response).payload[0].data,
-					...rest,
-					key,
-					url,
-				});
+				let response = {};
+
+				try {
+					response = JSON.parse(this.response).payload[0].data;
+				} catch (e) {
+					console.error('JSON.parse error', e); // eslint-disable-line
+				} finally {
+					resolve({
+						...response,
+						...rest,
+						key,
+						url,
+					});
+				}
 			} else {
 				const error = new Error(this.statusText);
 				error.code = this.status;

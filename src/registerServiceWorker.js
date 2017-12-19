@@ -65,13 +65,11 @@ function registerValidSW(swUrl) {
 	navigator.serviceWorker
 		.register(swUrl)
 		.then(registration => {
-			// setInterval(() => {
-				navigator.geolocation.watchPosition(params => {
-					const time = `${Date.now()}`;
-					serviceWorkerRef.push().set(time);
-					console.log('параметры', params);
-				});
-			// }, 5000);
+			// navigator.geolocation.watchPosition(params => {
+			// 	const time = `${Date.now()}`;
+			// 	serviceWorkerRef.push().set(time);
+			// 	console.log('параметры', params);
+			// });
 			registration.onupdatefound = () => {
 				const installingWorker = registration.installing;
 				installingWorker.onstatechange = () => {

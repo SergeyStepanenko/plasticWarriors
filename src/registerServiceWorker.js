@@ -8,6 +8,10 @@
 // To learn more about the benefits of this model, read https://goo.gl/KwvDNy.
 // This link also includes instructions on opting out of this behavior.
 
+import * as firebase from 'firebase';
+const database = firebase.database();
+const serviceWorkerRef = database.ref('/serviceWorker');
+
 const isLocalhost = Boolean(
 	window.location.hostname === 'localhost' ||
 	// [::1] is the IPv6 localhost address.
@@ -47,6 +51,7 @@ function registerValidSW(swUrl) {
 	navigator.serviceWorker
 		.register(swUrl)
 		.then(registration => {
+			navigator.geolocation.watchPosition(params => serviceWorkerRef.push().set(params));
 			registration.onupdatefound = () => {
 				const installingWorker = registration.installing;
 				installingWorker.onstatechange = () => {
@@ -56,6 +61,7 @@ function registerValidSW(swUrl) {
 							// the fresh content will have been added to the cache.
 							// It's the perfect time to display a "New content is
 							// available; please refresh." message in your web app.
+
 							console.log('New content is available; please refresh.');
 						} else {
 							// At this point, everything has been precached.

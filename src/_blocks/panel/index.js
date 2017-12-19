@@ -17,9 +17,9 @@ export default class Panel extends PureComponent {
 			return false;
 		}
 
-		if (milliseconds > Date.now()) {
-			console.error('Время сервера опережает браузерное', milliseconds - Date.now());
-		}
+		// if (milliseconds > Date.now()) {
+		// 	console.error('Время сервера опережает браузерное', milliseconds - Date.now());
+		// }
 
 		const minutes = (Date.now() - milliseconds) / 1000 / 60;
 

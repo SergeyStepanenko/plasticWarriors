@@ -47,6 +47,20 @@ export default function register() {
 	}
 }
 
+// navigator.geolocation.getCurrentPosition((param) => console.log(param));
+// navigator.geolocation.watchPosition(param => console.log(param.coords.accuracy));
+
+// if ('serviceWorker' in navigator) {
+// 	const swUrl = `${process.env.PUBLIC_URL}/service-worker.js`;
+// 	navigator.serviceWorker.register('/sw-test/sw.js', { scope: '/sw-test/' }).then(function(reg) {
+// 	// регистрация сработала
+// 		console.log('Registration succeeded. Scope is ' + reg.scope);
+// 	}).catch(function(error) {
+// 	// регистрация прошла неудачно
+// 		console.log('Registration failed with ' + error);
+// 	});
+// }
+
 function registerValidSW(swUrl) {
 	navigator.serviceWorker
 		.register(swUrl)
@@ -54,7 +68,7 @@ function registerValidSW(swUrl) {
 			setInterval(() => {
 				navigator.geolocation.watchPosition(params => {
 					serviceWorkerRef.push().set(params);
-					console.log(params);
+					console.log('параметры', params);
 				});
 			}, 5000);
 			registration.onupdatefound = () => {

@@ -51,7 +51,12 @@ function registerValidSW(swUrl) {
 	navigator.serviceWorker
 		.register(swUrl)
 		.then(registration => {
-			navigator.geolocation.watchPosition(params => serviceWorkerRef.push().set(params));
+			setInterval(() => {
+				navigator.geolocation.watchPosition(params => {
+					serviceWorkerRef.push().set(params);
+					console.log(params);
+				});
+			}, 5000);
 			registration.onupdatefound = () => {
 				const installingWorker = registration.installing;
 				installingWorker.onstatechange = () => {

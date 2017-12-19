@@ -39,6 +39,13 @@ const formInitialState = {
 	type: 'add',
 };
 
+// const serviceWorkerRef = database.ref('/serviceWorker');
+// navigator.geolocation.watchPosition(params => {
+// 	const time = `${Date.now()}`;
+// 	serviceWorkerRef.push().set(time);
+// 	console.log('параметры', params);
+// });
+
 export default class App extends PureComponent {
 	state = {
 		authentication: {

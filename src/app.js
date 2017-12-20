@@ -141,7 +141,7 @@ export default class App extends PureComponent {
 			}, () => {
 				// this.setState({ areUnitsLoading: false });
 				// this.paintWarriorsOnMap({ imgData: this.state.imgParams, warriors: this.state.mappedWarriors });
-				this.recalculatePosition();
+				setTimeout(() => this.recalculatePosition(), 1000);
 			});
 		});
 

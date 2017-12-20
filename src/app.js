@@ -193,6 +193,15 @@ export default class App extends PureComponent {
 		});
 	}
 
+	refreshData = () => {
+		const configRef = database.ref('/config/counter');
+		configRef.once('value').then((snap) => {
+			let counter = snap.val();
+			counter = counter += 1;
+			configRef.set(counter);
+		});
+	}
+
 	handleSubmit = (key) => {
 		this.sendUnitToFirebase({
 			key,
@@ -427,10 +436,11 @@ export default class App extends PureComponent {
 							Выйти
 						</B.Button>
 						<B.Button
-							onClick={this.requestAndHandleResponse}
-							disabled={isTrackingDataLoading}
+							onClick={this.refreshData}
+							// disabled={isTrackingDataLoading}
 						>
-							{isTrackingDataLoading ? 'Обновляется' : 'Обновить карту'}
+							{/* {isTrackingDataLoading ? 'Обновляется' : 'Обновить карту'} */}
+							Обновить карту
 						</B.Button>
 					</div>
 				</div>

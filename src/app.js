@@ -116,21 +116,32 @@ export default class App extends PureComponent {
 			const data = snap.val();
 
 			const selectedMapId = localStorage.getItem('selectedMap');
+			const keys = Object.keys(data.units);
+
+			const mappedWarriors = keys.map((key) => {
+				return {
+					key,
+					...data.units[key],
+					...data.kidsTrackData[key],
+				};
+			});
+
+			const imgParams = this.$image.getBoundingClientRect();
 
 			this.setState({
 				units: data.units,
 				maps: data.maps,
 				selectedMapId,
+				mappedWarriors,
+				keys,
+				imgParams,
 				map: {
 					...data.maps[selectedMapId || '-L0AjXER8To8hYfZfuAw'],
 				}
 			}, () => {
-				this.setState({ areUnitsLoading: false });
-				this.requestAndHandleResponse();
-
-				// this.interval = setInterval(() => {
-				// 	this.requestAndHandleResponse();
-				// }, 120000);
+				// this.setState({ areUnitsLoading: false });
+				// this.paintWarriorsOnMap({ imgData: this.state.imgParams, warriors: this.state.mappedWarriors });
+				this.recalculatePosition();
 			});
 		});
 
@@ -231,6 +242,9 @@ export default class App extends PureComponent {
 	}
 
 	requestKidsTrackData = async (units) => {
+		if (!units) {
+			return;
+		}
 		const keys = Object.keys(units);
 		const promises = [
 			...keys.map(key => requestData({ CORS, key, ...units[key] }))
@@ -296,7 +310,6 @@ export default class App extends PureComponent {
 		const positionedWarriors = warriors.map((warrior) => {
 			const isInLngRange = +warrior.lng > +map.west && +warrior.lng < +map.east;
 			const isInlatRange = +warrior.lat > +map.south && +warrior.lat < +map.north;
-
 			return {
 				...warrior,
 				lngInPx: (warrior.lng - map.west) * Xscale,
@@ -310,17 +323,17 @@ export default class App extends PureComponent {
 		});
 	}
 
-	requestAndHandleResponse = () => {
-		this.setState({
-			imgParams: this.$image.getBoundingClientRect(),
-			isTrackingDataLoading: true,
-		}, async () => {
-			await this.requestKidsTrackData(this.state.units);
-			this.setState({
-				isTrackingDataLoading: false,
-			});
-		});
-	}
+	// requestAndHandleResponse = () => {
+	// 	this.setState({
+	// 		imgParams: this.$image.getBoundingClientRect(),
+	// 		isTrackingDataLoading: true,
+	// 	}, async () => {
+	// 		await this.requestKidsTrackData(this.state.units);
+	// 		this.setState({
+	// 			isTrackingDataLoading: false,
+	// 		});
+	// 	});
+	// }
 
 	editWarrior = ({ units, key }) => {
 		this.setState({

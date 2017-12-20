@@ -39,7 +39,7 @@ export default class Panel extends PureComponent {
 	render() {
 		const { units, positionedWarriors, admin } = this.props;
 		const LOADING = 'загружается';
-		let fbArray = Object.keys(units).map(value => ({ ...units[value] }));
+		let fbArray = units && Object.keys(units).map(value => ({ ...units[value] }));
 
 		if (positionedWarriors.length) {
 			fbArray = positionedWarriors;
@@ -47,7 +47,7 @@ export default class Panel extends PureComponent {
 
 		return (
 			<div>
-				<B.Panel header={`Статистика: всего - ${fbArray.length}`} bsStyle="primary">
+				<B.Panel header={`Статистика: всего - ${fbArray && fbArray.length || ''}`} bsStyle="primary">
 					<B.FormGroup className='app__panel'>
 						<table>
 							<thead>
@@ -64,7 +64,7 @@ export default class Panel extends PureComponent {
 							</thead>
 							<tbody>
 								{
-									fbArray.map((warrior) => {
+									fbArray && fbArray.map((warrior) => {
 										const timeAgo = this.getMinutesAgo(warrior.time);
 										const accuracy = warrior.acc && `${warrior.acc}m` || LOADING;
 										const batteryLevel = warrior.batteryLvl && `${warrior.batteryLvl}%` || LOADING;

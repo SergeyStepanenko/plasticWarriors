@@ -48,7 +48,7 @@ export default class Warriors extends PureComponent {
 							<div key={warrior.key}>
 								{
 									warrior.isInRange &&
-										<B.OverlayTrigger id={warrior.key} overlay={tooltip}>
+										<B.OverlayTrigger key={warrior.key} overlay={tooltip}>
 											<div style={pinStyles}>
 												<PinSVG2 color={warrior.color} />
 											</div>

@@ -61,6 +61,20 @@ export default class WarriorForm extends PureComponent {
 									value={form.url}
 								/>
 							</B.Col>
+							<B.Col sm={4}>
+								<B.Button
+									onClick={() => this.props.handleSubmit(form.key)}
+									disabled={isFormCompleted}
+								>
+									{CONSTANTS[form.type].submit}
+								</B.Button>
+								{
+									form.type === 'edit' &&
+									<B.Button onClick={() => this.props.handleFormReset()}>
+										{CONSTANTS[form.type].reset}
+									</B.Button>
+								}
+							</B.Col>
 						</B.FormGroup>
 					</B.Col>
 					<B.Col md={6}>
@@ -73,24 +87,6 @@ export default class WarriorForm extends PureComponent {
 									onChangeComplete={this.props.handleColorPick}
 									color={form.color}
 								/>
-							</B.Col>
-						</B.FormGroup>
-					</B.Col>
-					<B.Col md={2}>
-						<B.FormGroup>
-							<B.Col sm={4}>
-								<B.Button
-									onClick={() => this.props.handleSubmit(form.key)}
-									disabled={isFormCompleted}
-								>
-									{CONSTANTS[form.type].submit}
-								</B.Button>
-								{
-									form.type === 'edit' &&
-										<B.Button onClick={() => this.props.handleFormReset()}>
-											{CONSTANTS[form.type].reset}
-										</B.Button>
-								}
 							</B.Col>
 						</B.FormGroup>
 					</B.Col>

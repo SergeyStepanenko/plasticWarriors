@@ -110,16 +110,18 @@ export default class MapAddForm extends PureComponent {
 							</B.Col>
 						</B.FormGroup>
 					</B.Col>
-					<B.Col md={4}>
+					<B.Col md={12}>
 						<B.FormGroup>
-							<B.ControlLabel>Выберите сохраненную карту</B.ControlLabel>
-							<B.FormControl
-								componentClass='select'
-								value={selectedMapId || ''}
-								onChange={this.props.handleMapSelect}
-							>
-								<MapsList maps={mapsData} selected={selectedMapId}/>
-							</B.FormControl>
+							<B.Col md={12}>
+								<B.ControlLabel>Выберите сохраненную карту</B.ControlLabel>
+								<B.FormControl
+									componentClass='select'
+									value={selectedMapId || ''}
+									onChange={this.props.handleMapSelect}
+								>
+									<MapsList maps={mapsData} selected={selectedMapId} />
+								</B.FormControl>
+							</B.Col>
 						</B.FormGroup>
 					</B.Col>
 				</B.Panel>

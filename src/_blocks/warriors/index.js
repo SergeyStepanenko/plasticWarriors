@@ -21,7 +21,7 @@ export default class Warriors extends PureComponent {
 		return (
 			<div className='app__warriors'>
 				{
-					positionedWarriors.sort((a, b) => a.color < b.color).map((warrior) => {
+					positionedWarriors.sort((a, b) => a.color > b.color ? 1 : -1 ).map((warrior) => {
 						const shiftOnMap = `translate(${warrior.lngInPx - iconSize / 2}px, ${warrior.ltdInPx - iconSize / 2}px)`;
 						const pinStyles = {
 							position: 'absolute',

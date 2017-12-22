@@ -25,6 +25,7 @@ firebase.auth().languageCode = 'ru';
 
 const provider = new firebase.auth.GoogleAuthProvider();
 const ICONSIZE = 15;
+const ICONRESIZESTEP = 2;
 const SHIFTYAXIS = '40px';
 const database = firebase.database();
 const rootRef = database.ref('/');
@@ -169,7 +170,10 @@ export default class App extends PureComponent {
 	}
 
 	signOut = (event) => {
-		event.preventDefault();
+		if (event) {
+			event.preventDefault();
+		}
+
 		firebase.auth().signOut().then(() => {
 			this.setState({
 				authentication: {
@@ -187,12 +191,15 @@ export default class App extends PureComponent {
 		const configRef = database.ref('/config/counter');
 		configRef.once('value').then((snap) => {
 			let counter = snap.val();
-			counter = counter += 1;
-			configRef.set(counter);
+			configRef.set(++counter);
 		});
 	}
 
 	handleSubmit = (key) => {
+		if (!key) {
+			return console.error('key is not provided'); // eslint-disable-line
+		}
+
 		this.sendUnitToFirebase({
 			key,
 			name: this.state.form.name.trim(),
@@ -237,6 +244,9 @@ export default class App extends PureComponent {
 	}
 
 	deleteUnitFromFirebase = (key) => {
+		if (!key) {
+			return;
+		}
 		database.ref(`/units/${key}`).remove();
 	}
 
@@ -251,10 +261,16 @@ export default class App extends PureComponent {
 	}
 
 	sendMapToFirebase = (data) => {
+		if (!data) {
+			return;
+		}
 		mapsRef.push().set({ ...data });
 	}
 
 	handleMapSelect = (event) => {
+		if (event) {
+			event.preventDefault();
+		}
 		const mapId = event.target.value;
 		const { maps } = this.state;
 		const map = maps[mapId];
@@ -274,6 +290,9 @@ export default class App extends PureComponent {
 	}
 
 	handleColorPick = (color) => {
+		if (!color) {
+			return;
+		}
 		this.setState({
 			form: {
 				...this.state.form,
@@ -304,6 +323,10 @@ export default class App extends PureComponent {
 	}
 
 	editWarrior = ({ units, key }) => {
+		if (!units || !key) {
+			return;
+		}
+
 		this.setState({
 			form: {
 				name: units[key].name,
@@ -316,6 +339,9 @@ export default class App extends PureComponent {
 	}
 
 	deleteWarrior = (key) => {
+		if (!key) {
+			return;
+		}
 
 		this.setState({
 			modal: {
@@ -339,13 +365,13 @@ export default class App extends PureComponent {
 
 	resize = (flag) => {
 		const { iconSize } = this.state;
-		const step = 2;
+
 		let size = iconSize;
 
 		switch (flag) {
-		case '+': size += step;
+		case '+': size += ICONRESIZESTEP;
 			break;
-		case '-': size -= step;
+		case '-': size -= ICONRESIZESTEP;
 			break;
 		default:
 			size = ICONSIZE;
@@ -368,7 +394,10 @@ export default class App extends PureComponent {
 			selectedMapId,
 			iconSize,
 		} = this.state;
-		const { authenticated, admin } = this.state.authentication;
+		const {
+			authenticated,
+			admin,
+		} = this.state.authentication;
 
 		return (
 			<div className='app'>

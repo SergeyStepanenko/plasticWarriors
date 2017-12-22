@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import * as B from 'react-bootstrap';
 import { PinSVG2 } from '../index';
 
+const NOTAVALIABLE = 'n/a';
+
 export default class Panel extends PureComponent {
 	static propTypes = {
 		units: PropTypes.object.isRequired,
@@ -10,6 +12,11 @@ export default class Panel extends PureComponent {
 		editWarrior: PropTypes.func.isRequired,
 		deleteWarrior: PropTypes.func.isRequired,
 		admin: PropTypes.bool,
+	}
+
+	static defaultProps = {
+		positionedWarriors: [],
+		units: {},
 	}
 
 	getMinutesAgo = (milliseconds) => {
@@ -38,16 +45,11 @@ export default class Panel extends PureComponent {
 
 	render() {
 		const { units, positionedWarriors, admin } = this.props;
-		const LOADING = 'загружается';
-		let fbArray = units && Object.keys(units).map(value => ({ ...units[value] }));
-
-		if (positionedWarriors.length) {
-			fbArray = positionedWarriors;
-		}
+		// let fbArray = Object.keys(units).map(value => ({ ...units[value] }));
 
 		return (
 			<div>
-				<B.Panel header={`Статистика: всего - ${fbArray && fbArray.length || ''}`} bsStyle="primary">
+				<B.Panel header={`Статистика: всего - ${positionedWarriors.length || ''}`} bsStyle="primary">
 					<B.FormGroup className='app__panel'>
 						<table>
 							<thead>
@@ -64,16 +66,17 @@ export default class Panel extends PureComponent {
 							</thead>
 							<tbody>
 								{
-									fbArray && fbArray.map((warrior) => {
+									positionedWarriors.map((warrior) => {
+										const redPanelClassName = 'app__panel-red';
 										const timeAgo = this.getMinutesAgo(warrior.time);
-										const accuracy = warrior.acc && `${warrior.acc}m` || LOADING;
-										const batteryLevel = warrior.batteryLvl && `${warrior.batteryLvl}%` || LOADING;
-										const timeAgoString = timeAgo && (timeAgo > 1 ? `${Math.round(timeAgo)}мин` : '<1мин') || LOADING;
+										const accuracy = warrior.acc ? `${warrior.acc}m` : NOTAVALIABLE;
+										const batteryLevel = warrior.batteryLvl ? `${warrior.batteryLvl}%` : NOTAVALIABLE;
+										const timeAgoString = timeAgo ? (timeAgo > 1 ? `${Math.round(timeAgo)}мин` : '<1мин') : NOTAVALIABLE;
 										const status = this.getStatus({ isInRange: warrior.isInRange, timeAgo });
 										const style = {
-											batteryLevel: warrior.batteryLvl < 33 ? 'app__panel-red' : '',
-											accuracy: warrior.acc > 25 ? 'app__panel-red' : '',
-											timeAgo: timeAgo > 5 ? 'app__panel-red' : '',
+											batteryLevel: warrior.batteryLvl < 33 ? redPanelClassName : '',
+											accuracy: warrior.acc > 25 ? redPanelClassName : '',
+											timeAgo: timeAgo > 5 ? redPanelClassName : '',
 										};
 
 										return (
@@ -85,7 +88,7 @@ export default class Panel extends PureComponent {
 														height='15px'
 													/>
 												</td>
-												<td>{warrior.name || LOADING}</td>
+												<td>{warrior.name || NOTAVALIABLE}</td>
 												<td className={style.timeAgo}>{timeAgoString}</td>
 												<td className={style.batteryLevel}>{batteryLevel}</td>
 												<td className={style.accuracy}>{accuracy}</td>

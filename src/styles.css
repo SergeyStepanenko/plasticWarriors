@@ -7,7 +7,7 @@ td {
   padding: 2px 10px !important; }
 
 .app {
-  min-width: 1024px; }
+  min-width: 800px; }
   .app__header {
     display: flex;
     justify-content: space-between;

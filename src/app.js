@@ -3,7 +3,6 @@ import * as firebase from 'firebase';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/css/bootstrap-theme.css';
 import * as B from 'react-bootstrap';
-import { requestData, Promise_all } from './helpers';
 import {
 	Modal,
 	WarriorForm,
@@ -25,8 +24,8 @@ firebase.initializeApp(config);
 firebase.auth().languageCode = 'ru';
 
 const provider = new firebase.auth.GoogleAuthProvider();
-const CORS = 'https://cors-anywhere.herokuapp.com/';
 const ICONSIZE = 15;
+const SHIFTYAXIS = '40px';
 const database = firebase.database();
 const rootRef = database.ref('/');
 const unitsRef = database.ref('/units');
@@ -38,13 +37,6 @@ const formInitialState = {
 	key: null,
 	type: 'add',
 };
-
-// const serviceWorkerRef = database.ref('/serviceWorker');
-// navigator.geolocation.watchPosition(params => {
-// 	const time = `${Date.now()}`;
-// 	serviceWorkerRef.push().set(time);
-// 	console.log('параметры', params);
-// });
 
 export default class App extends PureComponent {
 	state = {
@@ -139,9 +131,7 @@ export default class App extends PureComponent {
 					...data.maps[selectedMapId || '-L0AjXER8To8hYfZfuAw'],
 				}
 			}, () => {
-				// this.setState({ areUnitsLoading: false });
-				// this.paintWarriorsOnMap({ imgData: this.state.imgParams, warriors: this.state.mappedWarriors });
-				setTimeout(() => this.recalculatePosition(), 1000);
+				setTimeout(() => this.recalculatePosition(), 1500);
 			});
 		});
 
@@ -250,25 +240,6 @@ export default class App extends PureComponent {
 		database.ref(`/units/${key}`).remove();
 	}
 
-	requestKidsTrackData = async (units) => {
-		if (!units) {
-			return;
-		}
-		const keys = Object.keys(units);
-		const promises = [
-			...keys.map(key => requestData({ CORS, key, ...units[key] }))
-		];
-		const mappedWarriors = await Promise_all(promises);
-
-		this.setState({
-			mappedWarriors,
-			keys
-		}, () => {
-			this.recalculatePosition();
-			return Promise.resolve(mappedWarriors);
-		});
-	};
-
 	handleFormChange = (field, event) => {
 		event.preventDefault();
 		this.setState({
@@ -313,8 +284,8 @@ export default class App extends PureComponent {
 
 	paintWarriorsOnMap = ({ imgData, warriors }) => {
 		const { map } = this.state;
-		const Xscale = imgData.width / (+map.east - +map.west); // количество пикселей в одном градусе долготы (3093/0,0166=186325)
-		const Yscale = imgData.height / (+map.north - +map.south);  // количество пикселей в одном градусе широты (3093/0,00938=329744)
+		const Xscale = imgData.width / (+map.east - +map.west);
+		const Yscale = imgData.height / (+map.north - +map.south);
 
 		const positionedWarriors = warriors.map((warrior) => {
 			const isInLngRange = +warrior.lng > +map.west && +warrior.lng < +map.east;
@@ -331,18 +302,6 @@ export default class App extends PureComponent {
 			positionedWarriors,
 		});
 	}
-
-	// requestAndHandleResponse = () => {
-	// 	this.setState({
-	// 		imgParams: this.$image.getBoundingClientRect(),
-	// 		isTrackingDataLoading: true,
-	// 	}, async () => {
-	// 		await this.requestKidsTrackData(this.state.units);
-	// 		this.setState({
-	// 			isTrackingDataLoading: false,
-	// 		});
-	// 	});
-	// }
 
 	editWarrior = ({ units, key }) => {
 		this.setState({
@@ -402,7 +361,6 @@ export default class App extends PureComponent {
 			units,
 			form,
 			positionedWarriors,
-			isTrackingDataLoading,
 			modal,
 			keys,
 			maps,
@@ -410,8 +368,6 @@ export default class App extends PureComponent {
 			selectedMapId,
 			iconSize,
 		} = this.state;
-		const shiftYaxis = '40px';
-
 		const { authenticated, admin } = this.state.authentication;
 
 		return (
@@ -421,7 +377,7 @@ export default class App extends PureComponent {
 					show={modal.show}
 					onHide={this.modalHide}
 				/>
-				<div style={{ height: shiftYaxis }} className='app__header'>
+				<div style={{ height: SHIFTYAXIS }} className='app__header'>
 					<div className='app__header-lable'>
 						Трекер
 						<B.Button onClick={() => this.resize('+')}>+</B.Button>
@@ -429,30 +385,17 @@ export default class App extends PureComponent {
 						<B.Button onClick={() => this.resize('-')}>-</B.Button>
 					</div>
 					<div className='app__header-buttons'>
-						<B.Button onClick={this.signIn} disabled={authenticated}>
-							Войти
-						</B.Button>
-						<B.Button onClick={this.signOut} disabled={!authenticated}>
-							Выйти
-						</B.Button>
-						<B.Button
-							onClick={this.refreshData}
-							// disabled={isTrackingDataLoading}
-						>
-							{/* {isTrackingDataLoading ? 'Обновляется' : 'Обновить карту'} */}
-							Обновить карту
-						</B.Button>
+						<B.Button onClick={this.signIn} disabled={authenticated}>Войти</B.Button>
+						<B.Button onClick={this.signOut} disabled={!authenticated}>Выйти</B.Button>
+						<B.Button onClick={this.refreshData}>Обновить карту</B.Button>
 					</div>
 				</div>
 				<B.Row>
 					<div className='app__map' ref={(r) => { this.$image = r; }}	>
-						<B.Image
-							src={map.url}
-							responsive
-						/>
+						<B.Image src={map.url} responsive />
 					</div>
 					<Warriors
-						shift={shiftYaxis}
+						shift={SHIFTYAXIS}
 						positionedWarriors={positionedWarriors}
 						iconSize={iconSize}
 					/>

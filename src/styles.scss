@@ -11,7 +11,8 @@ td {
 
 
 .app {
-	min-width: 1024px;
+	// min-width: 1024px;
+	min-width: 800px;
 	&__header {
 		display: flex;
 		justify-content: space-between;

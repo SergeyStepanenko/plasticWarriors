@@ -8,10 +8,6 @@
 // To learn more about the benefits of this model, read https://goo.gl/KwvDNy.
 // This link also includes instructions on opting out of this behavior.
 
-import * as firebase from 'firebase';
-const database = firebase.database();
-const serviceWorkerRef = database.ref('/serviceWorker');
-
 const isLocalhost = Boolean(
 	window.location.hostname === 'localhost' ||
 	// [::1] is the IPv6 localhost address.
@@ -65,11 +61,6 @@ function registerValidSW(swUrl) {
 	navigator.serviceWorker
 		.register(swUrl)
 		.then(registration => {
-			// navigator.geolocation.watchPosition(params => {
-			// 	const time = `${Date.now()}`;
-			// 	serviceWorkerRef.push().set(time);
-			// 	console.log('параметры', params);
-			// });
 			registration.onupdatefound = () => {
 				const installingWorker = registration.installing;
 				installingWorker.onstatechange = () => {

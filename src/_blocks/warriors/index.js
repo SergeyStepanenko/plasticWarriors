@@ -4,6 +4,11 @@ import * as B from 'react-bootstrap';
 
 import { PinSVG2 } from '../index';
 
+const tooltipStyles = {
+	display: 'flex',
+	flexFlow: 'column',
+};
+
 export default class Warriors extends PureComponent {
 	static defaultProps = {
 		iconSize: 15,
@@ -15,13 +20,23 @@ export default class Warriors extends PureComponent {
 		iconSize: PropTypes.number,
 	}
 
+	sorting = (a, b) => {
+		if (a.color > b.color) {
+			return 1;
+		} else if (a.color < b.color) {
+			return -1;
+		}
+
+		return 0;
+	}
+
 	render() {
 		const { iconSize, positionedWarriors } = this.props;
 
 		return (
 			<div className='app__warriors'>
 				{
-					positionedWarriors.sort((a, b) => a.color > b.color ? 1 : -1 ).map((warrior) => {
+					positionedWarriors.sort(this.sorting).map((warrior) => {
 						const shiftOnMap = `translate(${warrior.lngInPx - iconSize / 2}px, ${warrior.ltdInPx - iconSize / 2}px)`;
 						const pinStyles = {
 							position: 'absolute',
@@ -31,17 +46,10 @@ export default class Warriors extends PureComponent {
 							marginTop: this.props.shift, // shift as per header height
 						};
 
-						const tooltipStyles = {
-							display: 'flex',
-							flexFlow: 'column',
-						};
 
 						const tooltip = (
 							<B.Tooltip id="tooltip" style={tooltipStyles}>
 								<div>{`Имя: ${warrior.name}`}</div>
-								<div>{`Уровень заряда: ${warrior.batteryLvl}`}</div>
-								<div>{`Acc: ${warrior.acc}`}</div>
-								<div>{`Sleep: ${warrior.sleep}`}</div>
 							</B.Tooltip>
 						);
 

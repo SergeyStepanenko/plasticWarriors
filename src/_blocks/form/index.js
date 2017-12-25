@@ -25,6 +25,18 @@ const CONSTANTS = {
 	}
 };
 
+const colors = [
+	'#ff0000',
+	'#ff8000',
+	'#ffff00',
+	'#80ff00',
+	'#00ffff',
+	'#0080ff',
+	'#0000ff',
+	'#FF00FF',
+];
+
+
 export default class WarriorForm extends PureComponent {
 	static propTypes = {
 		form: PropTypes.object.isRequired,
@@ -37,6 +49,12 @@ export default class WarriorForm extends PureComponent {
 	render() {
 		const { form } = this.props;
 		const isFormCompleted = !!~Object.values(form).indexOf('');
+
+		const editButton = (this.props.form.type === 'edit') ?
+			<B.Button onClick={() => this.props.handleFormReset()}>
+				{CONSTANTS[this.props.form.type].reset}
+			</B.Button>
+			: null;
 
 		return (
 			<B.Form horizontal>
@@ -62,31 +80,23 @@ export default class WarriorForm extends PureComponent {
 								/>
 							</B.Col>
 							<B.Col sm={4}>
-								<B.Button
-									onClick={() => this.props.handleSubmit(form.key)}
-									disabled={isFormCompleted}
-								>
-									{CONSTANTS[form.type].submit}
-								</B.Button>
-								{
-									form.type === 'edit' &&
-									<B.Button onClick={() => this.props.handleFormReset()}>
-										{CONSTANTS[form.type].reset}
-									</B.Button>
-								}
-							</B.Col>
-						</B.FormGroup>
-					</B.Col>
-					<B.Col md={6}>
-						<B.FormGroup>
-							<B.Col sm={6}>
 								<B.ControlLabel>
 									{CONSTANTS[form.type].pinColor}
 								</B.ControlLabel>
 								<CirclePicker
 									onChangeComplete={this.props.handleColorPick}
 									color={form.color}
+									colors={colors}
 								/>
+								<div className='app__form-buttons'>
+									<B.Button
+										onClick={() => this.props.handleSubmit(form.key)}
+										disabled={isFormCompleted}
+									>
+										{CONSTANTS[form.type].submit}
+									</B.Button>
+									{editButton}
+								</div>
 							</B.Col>
 						</B.FormGroup>
 					</B.Col>

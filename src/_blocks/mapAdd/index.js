@@ -102,6 +102,7 @@ export default class MapAddForm extends PureComponent {
 									value={form.west}
 								/>
 								<B.Button
+									className='app__form-buttons'
 									onClick={() => this.props.sendMapToFirebase(form)}
 									disabled={isFormCompleted}
 								>
@@ -110,38 +111,8 @@ export default class MapAddForm extends PureComponent {
 							</B.Col>
 						</B.FormGroup>
 					</B.Col>
-					<B.Col md={12}>
-						<B.FormGroup>
-							<B.Col md={12}>
-								<B.ControlLabel>Выберите сохраненную карту</B.ControlLabel>
-								<B.FormControl
-									componentClass='select'
-									value={selectedMapId || ''}
-									onChange={this.props.handleMapSelect}
-								>
-									<MapsList maps={mapsData} selected={selectedMapId} />
-								</B.FormControl>
-							</B.Col>
-						</B.FormGroup>
-					</B.Col>
 				</B.Panel>
 			</B.Form>
 		);
 	}
 }
-
-const MapsList = ({ maps }) => {
-	if (!maps) {
-		return [];
-	}
-
-	return (
-		Object.keys(maps).map(key => {
-			return (
-				<option key={key} value={key}>
-					{maps[key].name}
-				</option>
-			);
-		})
-	);
-};

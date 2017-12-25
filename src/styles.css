@@ -13,6 +13,7 @@ td {
     justify-content: space-between;
     align-items: center;
     flex-wrap: nowrap;
+    padding-right: 15px;
     margin-bottom: 0px !important;
     height: 40px !important;
     background-image: linear-gradient(to bottom, #337ab7 0%, #2e6da4 100%); }
@@ -24,6 +25,8 @@ td {
     .app__header-buttons {
       display: flex;
       flex-wrap: nowrap; }
+      .app__header-buttons button {
+        margin: 0 2px; }
   .app__map {
     width: 100%; }
     .app__map img {
@@ -50,9 +53,23 @@ td {
       line-height: 40px;
       vertical-align: middle;
       white-space: nowrap; }
+  .app__form-buttons {
+    display: flex;
+    flex-wrap: nowrap;
+    margin-top: 15px; }
+  .app__form-button-long {
+    width: 70px; }
+
+.control-label {
+  white-space: nowrap; }
 
 .row {
   margin: 0 !important; }
 
+.app__header-select-map {
+  width: 160px !important; }
+
 .circle-picker {
+  flex-flow: row;
+  flex-wrap: nowrap !important;
   margin-top: 10px; }

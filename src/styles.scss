@@ -1,7 +1,6 @@
 body {
 	margin: 0;
 	padding: 0;
-	// overflow-x: hidden;
 	font-family: sans-serif;
 }
 
@@ -9,15 +8,14 @@ td {
     padding: 2px 10px !important;
 }
 
-
 .app {
-	// min-width: 1024px;
 	min-width: 800px;
 	&__header {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
 		flex-wrap: nowrap;
+		padding-right: 15px;
 		margin-bottom: 0px !important;
 		height: 40px !important;
 		background-image: linear-gradient(to bottom, #337ab7 0%, #2e6da4 100%);
@@ -31,6 +29,9 @@ td {
 		&-buttons {
 			display: flex;
 			flex-wrap: nowrap;
+			button {
+				margin: 0 2px;
+			}
 		}
 	}
 	&__map {
@@ -69,23 +70,38 @@ td {
 			white-space: nowrap;
 		}
 	}
+	&__form {
+		&-buttons {
+			display: flex;
+			flex-wrap: nowrap;
+			margin-top: 15px;
+		}
+		&-button-long {
+			width: 70px;
+		}
+	}
 }
 
 // bootstrap styles reassignment
-.panel {
-	.panel-heading,
-	.panel-body {
-		// padding-left: 30px;
-	}
+.control-label {
+	white-space: nowrap;
 }
 
 .row {
 	margin: 0 !important;
 }
+
+.app__header {
+	&-select-map {
+		width: 160px !important;
+	}
+}
 // bootstrap styles reassignment
 
 // colorPicker reassignment
 .circle-picker {
+	flex-flow: row;
+	flex-wrap: nowrap !important;
 	margin-top: 10px;
 }
 // colorPicker reassignment

@@ -409,10 +409,18 @@ export default class App extends PureComponent {
 				<div style={{ height: SHIFTYAXIS }} className='app__header'>
 					<div className='app__header-lable'>
 						Трекер
-						<B.Button onClick={() => this.resize('+')}>+</B.Button>
+						<B.Button className='app__form-button-long' onClick={() => this.resize('+')}>+</B.Button>
 						<B.Button onClick={this.resize}>0</B.Button>
-						<B.Button onClick={() => this.resize('-')}>-</B.Button>
+						<B.Button className='app__form-button-long' onClick={() => this.resize('-')}>-</B.Button>
 					</div>
+					<B.FormControl
+						className='app__header-select-map'
+						componentClass='select'
+						value={selectedMapId || ''}
+						onChange={this.handleMapSelect}
+					>
+						<MapsList maps={this.state.maps} selected={selectedMapId} />
+					</B.FormControl>
 					<div className='app__header-buttons'>
 						<B.Button onClick={this.signIn} disabled={authenticated}>Войти</B.Button>
 						<B.Button onClick={this.signOut} disabled={!authenticated}>Выйти</B.Button>
@@ -462,3 +470,20 @@ export default class App extends PureComponent {
 		);
 	}
 }
+
+
+const MapsList = ({ maps }) => {
+	if (!maps) {
+		return [];
+	}
+
+	return (
+		Object.keys(maps).map(key => {
+			return (
+				<option key={key} value={key}>
+					{maps[key].name}
+				</option>
+			);
+		})
+	);
+};

@@ -60,7 +60,7 @@ export default class Panel extends PureComponent {
 									<td>Заряд</td>
 									<td>Точность</td>
 									<td>Статус</td>
-									<td></td>
+									<td>Ссылка</td>
 									<td></td>
 								</tr>
 							</thead>
@@ -94,7 +94,13 @@ export default class Panel extends PureComponent {
 												<td className={style.accuracy}>{accuracy}</td>
 												<td className='app__panel-status'>{status}</td>
 												<td>
-													<a href={warrior.url} target='_blank'>Ссылка</a>
+													<B.Button
+														href={warrior.url}
+														bsStyle='link'
+														target='_blank'
+													>
+														&#x1F517;
+													</B.Button>
 												</td>
 												{
 													admin &&
@@ -107,7 +113,7 @@ export default class Panel extends PureComponent {
 												{
 													admin &&
 														<td>
-															<B.Button onClick={() => this.props.deleteWarrior(warrior.key)}>
+															<B.Button bsStyle='danger' onClick={() => this.props.deleteWarrior(warrior.key)}>
 																Удалить
 															</B.Button>
 														</td>

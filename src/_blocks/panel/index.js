@@ -24,10 +24,6 @@ export default class Panel extends PureComponent {
 			return false;
 		}
 
-		// if (milliseconds > Date.now()) {
-		// 	console.error('Время сервера опережает браузерное', milliseconds - Date.now());
-		// }
-
 		const minutes = (Date.now() - milliseconds) / 1000 / 60;
 
 		return minutes;
@@ -45,7 +41,6 @@ export default class Panel extends PureComponent {
 
 	render() {
 		const { units, positionedWarriors, admin } = this.props;
-		// let fbArray = Object.keys(units).map(value => ({ ...units[value] }));
 
 		return (
 			<div>
@@ -99,7 +94,7 @@ export default class Panel extends PureComponent {
 														bsStyle='link'
 														target='_blank'
 													>
-														&#x1F517;
+														<span role='img'>&#x1F517;</span>
 													</B.Button>
 												</td>
 												{

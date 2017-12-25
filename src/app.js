@@ -124,6 +124,7 @@ export default class App extends PureComponent {
 			const imgParams = this.$image.getBoundingClientRect();
 
 			this.setState({
+				data,
 				units: data.units,
 				maps: data.maps,
 				selectedMapId,
@@ -133,7 +134,10 @@ export default class App extends PureComponent {
 				map: {
 					...data.maps[selectedMapId || '-L0AjXER8To8hYfZfuAw'],
 				}
+			}, () => {
+				this.calculatePosition();
 			});
+
 		});
 
 		window.addEventListener('resize', this.calculatePosition);
@@ -214,9 +218,24 @@ export default class App extends PureComponent {
 
 	calculatePosition = () => {
 		const imgParams = this.$image.getBoundingClientRect();
-		this.paintWarriorsOnMap({ imgData: imgParams, warriors: this.state.mappedWarriors });
+		const { map, mappedWarriors } = this.state;
+		const Xscale = imgParams.width / (+map.east - +map.west);
+		const Yscale = imgParams.height / (+map.north - +map.south);
+
+		const positionedWarriors = mappedWarriors.map((warrior) => {
+			const isInLngRange = +warrior.lng > +map.west && +warrior.lng < +map.east;
+			const isInlatRange = +warrior.lat > +map.south && +warrior.lat < +map.north;
+
+			return {
+				...warrior,
+				lngInPx: (warrior.lng - map.west) * Xscale,
+				ltdInPx: (map.north - warrior.lat) * Yscale,
+				isInRange: isInLngRange && isInlatRange,
+			};
+		});
 
 		this.setState({
+			positionedWarriors,
 			imgParams,
 		});
 	}
@@ -236,7 +255,6 @@ export default class App extends PureComponent {
 
 			unitsRef.update(updates);
 		}
-
 	}
 
 	deleteUnitFromFirebase = (key) => {
@@ -274,13 +292,7 @@ export default class App extends PureComponent {
 		this.setState({
 			map,
 			selectedMapId: mapId,
-		}, () => {
-			setTimeout(() => {
-				this.calculatePosition();
-			}, 500);
-
-			localStorage.setItem('selectedMap', mapId);
-		});
+		}, () => localStorage.setItem('selectedMap', mapId));
 
 
 	}
@@ -296,27 +308,6 @@ export default class App extends PureComponent {
 			}
 		});
 	};
-
-	paintWarriorsOnMap = ({ imgData, warriors }) => {
-		const { map } = this.state;
-		const Xscale = imgData.width / (+map.east - +map.west);
-		const Yscale = imgData.height / (+map.north - +map.south);
-
-		const positionedWarriors = warriors.map((warrior) => {
-			const isInLngRange = +warrior.lng > +map.west && +warrior.lng < +map.east;
-			const isInlatRange = +warrior.lat > +map.south && +warrior.lat < +map.north;
-			return {
-				...warrior,
-				lngInPx: (warrior.lng - map.west) * Xscale,
-				ltdInPx: (map.north - warrior.lat) * Yscale,
-				isInRange: isInLngRange && isInlatRange,
-			};
-		});
-
-		this.setState({
-			positionedWarriors,
-		});
-	}
 
 	editWarrior = ({ units, key }) => {
 		if (!units || !key) {
@@ -408,7 +399,7 @@ export default class App extends PureComponent {
 						<B.ButtonGroup className='app__header-button-group'>
 							<B.Button className='app__form-button-long' onClick={() => this.resize('+')}>+</B.Button>
 							<B.Button onClick={this.resize}>
-								<img className='app__header-reset-button' src={resetSVG}></img>
+								<img className='app__header-reset-button' alt='reset' src={resetSVG}></img>
 							</B.Button>
 							<B.Button className='app__form-button-long' onClick={() => this.resize('-')}>-</B.Button>
 						</B.ButtonGroup>

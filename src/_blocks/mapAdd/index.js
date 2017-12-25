@@ -2,28 +2,6 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import * as B from 'react-bootstrap';
 
-// const CONSTANTS = {
-// 	add: {
-// 		header: 'Добавление юнита:',
-// 		name: 'Имя воина',
-// 		enterName: 'Введите имя воина',
-// 		link: 'Ссылка из trackKids',
-// 		enterLink: 'Введите ссылку',
-// 		pinColor: 'Цвет метки на карте',
-// 		submit: 'Добавить',
-// 	},
-// 	edit: {
-// 		header: 'Изменение юнита:',
-// 		name: 'Введите новое имя воина',
-// 		enterName: 'Введите новое имя воина',
-// 		link: 'Введите новую ссылку из trackKids',
-// 		enterLink: 'Введите новую ссылку',
-// 		pinColor: 'Выберите новый цвет',
-// 		submit: 'Изменить',
-// 		reset: 'Отмена'
-// 	}
-// };
-
 export default class MapAddForm extends PureComponent {
 	static propTypes = {
 		sendMapToFirebase: PropTypes.func.isRequired,
@@ -56,7 +34,6 @@ export default class MapAddForm extends PureComponent {
 
 	render() {
 		const { form } = this.state;
-		const { mapsData, selectedMapId } = this.props;
 		const isFormCompleted = !!~Object.values(form).indexOf('');
 
 		return (

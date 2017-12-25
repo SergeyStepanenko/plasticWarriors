@@ -9,8 +9,10 @@ import {
 	Warriors,
 	Panel,
 	MapAddForm,
-} from './_blocks';
+} from '_blocks';
 import { premissionRequest } from './config/roles';
+import resetSVG from 'assets/icons/spinner.svg';
+
 const config = {
 	apiKey: 'AIzaSyCB1TfuGQegOrHOPcFJFqpxDmMTSElXQVg',
 	authDomain: 'plastic-warriors.firebaseapp.com',
@@ -409,9 +411,13 @@ export default class App extends PureComponent {
 				<div style={{ height: SHIFTYAXIS }} className='app__header'>
 					<div className='app__header-lable'>
 						Трекер
-						<B.Button className='app__form-button-long' onClick={() => this.resize('+')}>+</B.Button>
-						<B.Button onClick={this.resize}>0</B.Button>
-						<B.Button className='app__form-button-long' onClick={() => this.resize('-')}>-</B.Button>
+						<B.ButtonGroup className='app__header-button-group'>
+							<B.Button className='app__form-button-long' onClick={() => this.resize('+')}>+</B.Button>
+							<B.Button onClick={this.resize}>
+								<img className='app__header-reset-button' src={resetSVG}></img>
+							</B.Button>
+							<B.Button className='app__form-button-long' onClick={() => this.resize('-')}>-</B.Button>
+						</B.ButtonGroup>
 					</div>
 					<B.FormControl
 						className='app__header-select-map'

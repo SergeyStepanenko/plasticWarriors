@@ -33,6 +33,13 @@ td {
 				margin: 0 2px;
 			}
 		}
+		&-button-group {
+			margin-left: 10px;
+		}
+		&-reset-button {
+			width: 15px;
+			height: 15px;
+		}
 	}
 	&__map {
 		width: 100%;

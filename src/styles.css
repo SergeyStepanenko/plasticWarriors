@@ -27,6 +27,11 @@ td {
       flex-wrap: nowrap; }
       .app__header-buttons button {
         margin: 0 2px; }
+    .app__header-button-group {
+      margin-left: 10px; }
+    .app__header-reset-button {
+      width: 15px;
+      height: 15px; }
   .app__map {
     width: 100%; }
     .app__map img {

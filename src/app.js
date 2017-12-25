@@ -3,6 +3,8 @@ import * as firebase from 'firebase';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/css/bootstrap-theme.css';
 import * as B from 'react-bootstrap';
+import { isEqual } from 'lodash';
+
 import {
 	Modal,
 	WarriorForm,
@@ -233,6 +235,13 @@ export default class App extends PureComponent {
 				isInRange: isInLngRange && isInlatRange,
 			};
 		});
+
+		if (
+			isEqual(this.state.positionedWarriors, positionedWarriors) &&
+			isEqual(this.state.imgParams, imgParams)
+		) {
+			return false;
+		}
 
 		this.setState({
 			positionedWarriors,

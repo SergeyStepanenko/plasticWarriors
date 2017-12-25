@@ -133,17 +133,15 @@ export default class App extends PureComponent {
 				map: {
 					...data.maps[selectedMapId || '-L0AjXER8To8hYfZfuAw'],
 				}
-			}, () => {
-				setTimeout(() => this.recalculatePosition(), 1500);
 			});
 		});
 
-		window.addEventListener('resize', this.recalculatePosition);
+		window.addEventListener('resize', this.calculatePosition);
 	}
 
 	componentWillUnmount() {
 		clearInterval(this.interval);
-		window.removeEventListener('resize', this.recalculatePosition);
+		window.removeEventListener('resize', this.calculatePosition);
 	}
 
 	signIn = (event) => {
@@ -198,10 +196,6 @@ export default class App extends PureComponent {
 	}
 
 	handleSubmit = (key) => {
-		if (!key) {
-			return console.error('key is not provided'); // eslint-disable-line
-		}
-
 		this.sendUnitToFirebase({
 			key,
 			name: this.state.form.name.trim(),
@@ -218,7 +212,7 @@ export default class App extends PureComponent {
 		});
 	}
 
-	recalculatePosition = () => {
+	calculatePosition = () => {
 		const imgParams = this.$image.getBoundingClientRect();
 		this.paintWarriorsOnMap({ imgData: imgParams, warriors: this.state.mappedWarriors });
 
@@ -282,7 +276,7 @@ export default class App extends PureComponent {
 			selectedMapId: mapId,
 		}, () => {
 			setTimeout(() => {
-				this.recalculatePosition();
+				this.calculatePosition();
 			}, 500);
 
 			localStorage.setItem('selectedMap', mapId);
@@ -435,7 +429,7 @@ export default class App extends PureComponent {
 				</div>
 				<B.Row>
 					<div className='app__map' ref={(r) => { this.$image = r; }}	>
-						<B.Image src={map.url} responsive />
+						<B.Image onLoad={this.calculatePosition} src={map.url} responsive />
 					</div>
 					<Warriors
 						shift={SHIFTYAXIS}

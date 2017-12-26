@@ -22,15 +22,12 @@ td {
 		&-lable {
 			color: #fff;
 			margin-left: 15px;
-			button {
-				margin: 0 10px;
-			}
 		}
 		&-buttons {
 			display: flex;
 			flex-wrap: nowrap;
 			button {
-				margin: 0 2px;
+				margin: 0 10px;
 			}
 		}
 		&-button-group {

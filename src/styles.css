@@ -20,13 +20,11 @@ td {
     .app__header-lable {
       color: #fff;
       margin-left: 15px; }
-      .app__header-lable button {
-        margin: 0 10px; }
     .app__header-buttons {
       display: flex;
       flex-wrap: nowrap; }
       .app__header-buttons button {
-        margin: 0 2px; }
+        margin: 0 10px; }
     .app__header-button-group {
       margin-left: 10px; }
     .app__header-reset-button {

@@ -94,7 +94,7 @@ export default class Panel extends PureComponent {
 														bsStyle='link'
 														target='_blank'
 													>
-														<span role='img'>&#x1F517;</span>
+														<span role='img' aria-label='link'>&#x1F517;</span>
 													</B.Button>
 												</td>
 												{

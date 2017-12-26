@@ -405,7 +405,7 @@ export default class App extends PureComponent {
 				<div style={{ height: SHIFTYAXIS }} className='app__header'>
 					<div className='app__header-lable'>
 						Трекер
-						<B.ButtonGroup className='app__header-button-group'>
+						<B.ButtonGroup className='app__header-button-group app__header-buttons'>
 							<B.Button className='app__form-button-long' onClick={() => this.resize('+')}>+</B.Button>
 							<B.Button onClick={this.resize}>
 								<img className='app__header-reset-button' alt='reset' src={resetSVG}></img>
@@ -422,9 +422,11 @@ export default class App extends PureComponent {
 						<MapsList maps={this.state.maps} selected={selectedMapId} />
 					</B.FormControl>
 					<div className='app__header-buttons'>
-						<B.Button onClick={this.signIn} disabled={authenticated}>Войти</B.Button>
-						<B.Button onClick={this.signOut} disabled={!authenticated}>Выйти</B.Button>
-						<B.Button onClick={this.refreshData}>Обновить карту</B.Button>
+						<B.ButtonGroup>
+							<B.Button onClick={this.signIn} disabled={authenticated}>Войти</B.Button>
+							<B.Button onClick={this.signOut} disabled={!authenticated}>Выйти</B.Button>
+							<B.Button onClick={this.refreshData}>Обновить карту</B.Button>
+						</B.ButtonGroup>
 					</div>
 				</div>
 				<B.Row>

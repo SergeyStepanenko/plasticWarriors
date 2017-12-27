@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import * as B from 'react-bootstrap';
 import { CirclePicker } from 'react-color';
 
+import { COLORS } from 'constants/index';
+
 const CONSTANTS = {
 	add: {
 		header: 'Добавление юнита:',
@@ -24,18 +26,6 @@ const CONSTANTS = {
 		reset: 'Отмена'
 	}
 };
-
-const colors = [
-	'#ff0000',
-	'#ff8000',
-	'#ffff00',
-	'#80ff00',
-	'#00ffff',
-	'#0080ff',
-	'#0000ff',
-	'#FF00FF',
-];
-
 
 export default class WarriorForm extends PureComponent {
 	static propTypes = {
@@ -101,7 +91,7 @@ export default class WarriorForm extends PureComponent {
 								<CirclePicker
 									onChangeComplete={this.props.handleColorPick}
 									color={form.color}
-									colors={colors}
+									colors={COLORS}
 								/>
 								<div className='app__form-buttons'>
 									<B.Button

@@ -327,6 +327,8 @@ export default class App extends PureComponent {
 				key,
 				type: 'edit',
 			},
+		}, () => {
+			this.toggleCollapse('warriorForm');
 		});
 	}
 

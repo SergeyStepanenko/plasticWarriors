@@ -1,8 +1,8 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import * as B from 'react-bootstrap';
-
 import { PinSVG2 } from '../index';
+import { COLORS } from 'constants/index';
 
 const tooltipStyles = {
 	display: 'flex',
@@ -20,15 +20,7 @@ export default class Warriors extends PureComponent {
 		iconSize: PropTypes.number,
 	}
 
-	sorting = (a, b) => {
-		if (a.color > b.color) {
-			return 1;
-		} else if (a.color < b.color) {
-			return -1;
-		}
-
-		return 0;
-	}
+	sorting = (a, b) => COLORS.indexOf(a.color) - COLORS.indexOf(b.color);
 
 	render() {
 		const { iconSize, positionedWarriors } = this.props;

@@ -30,6 +30,7 @@
     "react-bootstrap": "^0.31.5",
     "react-color": "^2.13.8",
     "react-dom": "^16.2.0",
-    "react-scripts": "1.0.17"
+    "react-scripts": "1.0.17",
+    "react-toggle-button": "^2.2.0"
   }
 }

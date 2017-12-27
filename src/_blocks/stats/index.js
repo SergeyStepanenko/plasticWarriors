@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import * as B from 'react-bootstrap';
+import ToggleButton from 'react-toggle-button';
 
 import { PinSVG2 } from '../index';
 
@@ -113,9 +114,12 @@ export default class Stats extends PureComponent {
 												<td className={style.accuracy}>{accuracy}</td>
 												<td className='app__panel-status'>{status}</td>
 												<td>
-													<B.Button onClick={() => this.props.toggleHideWarrior({ key: warrior.key, value: warrior.hidden }) }>
-														{warrior.hidden ? 'Показать' : 'Скрыть'}
-													</B.Button>
+													<ToggleButton
+														value={!warrior.hidden}
+														onToggle={(value) => {
+															this.props.toggleHideWarrior({ key: warrior.key, value });
+														}}
+													/>
 												</td>
 												{
 													admin &&

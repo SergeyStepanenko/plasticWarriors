@@ -7,8 +7,14 @@ export default class MapAddForm extends PureComponent {
 		sendMapToFirebase: PropTypes.func.isRequired,
 		handleFormReset: PropTypes.func,
 		handleMapSelect: PropTypes.func,
+		toggleCollapse: PropTypes.func.isRequired,
 		mapsData: PropTypes.object,
 		selectedMapId: PropTypes.string,
+		collapsed: PropTypes.bool,
+	}
+
+	static defaultProps = {
+		collapsed: false,
 	}
 
 	state = {
@@ -38,7 +44,16 @@ export default class MapAddForm extends PureComponent {
 
 		return (
 			<B.Form horizontal>
-				<B.Panel header='Добавить новую карту' bsStyle="primary">
+				<B.Panel
+					header='Добавить новую карту'
+					bsStyle="primary"
+					onClick={() => this.props.toggleCollapse('mapForm')}
+				/>
+				<B.Panel
+					bsStyle="primary"
+					expanded={!this.props.collapsed}
+					collapsible
+				>
 					<B.Col md={4}>
 						<B.FormGroup>
 							<B.Col md={12}>

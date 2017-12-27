@@ -56,7 +56,7 @@ export default class Warriors extends PureComponent {
 						return (
 							<div key={warrior.key}>
 								{
-									warrior.isInRange &&
+									warrior.isInRange && !warrior.hidden &&
 										<B.OverlayTrigger key={warrior.key} overlay={tooltip}>
 											<div style={pinStyles}>
 												<PinSVG2 color={warrior.color} />

@@ -9,7 +9,7 @@ import {
 	Modal,
 	WarriorForm,
 	Warriors,
-	Panel,
+	Stats,
 	MapAddForm,
 } from '_blocks';
 import { premissionRequest } from './config/roles';
@@ -69,6 +69,11 @@ export default class App extends PureComponent {
 			height: 0,
 		},
 		iconSize: ICONSIZE,
+		expanded: {
+			stats: localStorage.getItem('stats') === 'true',
+			mapForm: localStorage.getItem('mapForm') === 'true',
+			warriorForm: localStorage.getItem('warriorForm') === 'true',
+		},
 	}
 
 	componentWillMount() {
@@ -111,19 +116,16 @@ export default class App extends PureComponent {
 	componentDidMount() {
 		rootRef.on('value', (snap) => {
 			const data = snap.val();
-
-			const selectedMapId = localStorage.getItem('selectedMap');
+			const selectedMapId = localStorage.getItem('selectedMap') || '';
 			const keys = Object.keys(data.units);
-
-			const mappedWarriors = keys.map((key) => {
-				return {
-					key,
-					...data.units[key],
-					...data.kidsTrackData[key],
-				};
-			});
-
+			const mappedWarriors = keys.map((key) => ({
+				key,
+				hidden: localStorage.getItem(key) === 'true',
+				...data.units[key],
+				...data.kidsTrackData[key],
+			}));
 			const imgParams = this.$image.getBoundingClientRect();
+			const map = { ...data.maps[selectedMapId || '-L0AjXER8To8hYfZfuAw'] };
 
 			this.setState({
 				data,
@@ -133,20 +135,16 @@ export default class App extends PureComponent {
 				mappedWarriors,
 				keys,
 				imgParams,
-				map: {
-					...data.maps[selectedMapId || '-L0AjXER8To8hYfZfuAw'],
-				}
+				map,
 			}, () => {
 				this.calculatePosition();
 			});
-
 		});
 
 		window.addEventListener('resize', this.calculatePosition);
 	}
 
 	componentWillUnmount() {
-		clearInterval(this.interval);
 		window.removeEventListener('resize', this.calculatePosition);
 	}
 
@@ -302,8 +300,6 @@ export default class App extends PureComponent {
 			map,
 			selectedMapId: mapId,
 		}, () => localStorage.setItem('selectedMap', mapId));
-
-
 	}
 
 	handleColorPick = (color) => {
@@ -378,6 +374,35 @@ export default class App extends PureComponent {
 		});
 	}
 
+	toggleCollapse = (block) => {
+		this.setState(prevState => ({
+			expanded: {
+				...this.state.expanded,
+				[block]: !prevState.expanded[block],
+			}
+		}), () => {
+			localStorage[block] = this.state.expanded[block];
+		});
+	}
+
+	toggleHideWarrior = ({ key, value }) => {
+		const { positionedWarriors } = this.state;
+
+		if (!positionedWarriors.length) {
+			return;
+		}
+
+		localStorage.setItem(key, !value);
+
+		let clone = [ ...positionedWarriors ];
+		const index = clone.findIndex(warrior => warrior.key === key);
+		clone[index].hidden = !clone[index].hidden;
+
+		this.setState({
+			positionedWarriors: clone,
+		});
+	}
+
 	render() {
 		const {
 			units,
@@ -416,7 +441,7 @@ export default class App extends PureComponent {
 					<B.FormControl
 						className='app__header-select-map'
 						componentClass='select'
-						value={selectedMapId || ''}
+						value={selectedMapId}
 						onChange={this.handleMapSelect}
 					>
 						<MapsList maps={this.state.maps} selected={selectedMapId} />
@@ -441,13 +466,16 @@ export default class App extends PureComponent {
 				</B.Row>
 				<B.Row>
 					<B.Col>
-						<Panel
+						<Stats
 							admin={admin}
 							keys={keys}
 							units={units}
 							editWarrior={this.editWarrior}
 							deleteWarrior={this.deleteWarrior}
 							positionedWarriors={positionedWarriors}
+							toggleCollapse={this.toggleCollapse}
+							collapsed={this.state.expanded.stats}
+							toggleHideWarrior={this.toggleHideWarrior}
 						/>
 					</B.Col>
 				</B.Row>
@@ -458,6 +486,8 @@ export default class App extends PureComponent {
 						handleSubmit={this.handleSubmit}
 						handleColorPick={this.handleColorPick}
 						handleFormReset={this.resetForm}
+						toggleCollapse={this.toggleCollapse}
+						collapsed={this.state.expanded.warriorForm}
 					/>
 				</B.Row>
 				<B.Row>
@@ -466,6 +496,8 @@ export default class App extends PureComponent {
 						mapsData={maps}
 						selectedMapId={selectedMapId}
 						handleMapSelect={this.handleMapSelect}
+						toggleCollapse={this.toggleCollapse}
+						collapsed={this.state.expanded.mapForm}
 					/>
 				</B.Row>
 			</div>

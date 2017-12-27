@@ -1,22 +1,32 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import * as B from 'react-bootstrap';
+
 import { PinSVG2 } from '../index';
 
 const NOTAVALIABLE = 'n/a';
 
-export default class Panel extends PureComponent {
+export default class Stats extends PureComponent {
 	static propTypes = {
 		units: PropTypes.object.isRequired,
 		positionedWarriors: PropTypes.array.isRequired,
 		editWarrior: PropTypes.func.isRequired,
+		toggleCollapse: PropTypes.func.isRequired,
 		deleteWarrior: PropTypes.func.isRequired,
+		toggleHideWarrior: PropTypes.func.isRequired,
 		admin: PropTypes.bool,
+		keys: PropTypes.array,
+		collapsed: PropTypes.bool,
 	}
 
 	static defaultProps = {
 		positionedWarriors: [],
 		units: {},
+		collapsed: false,
+	}
+
+	state = {
+		warriors: {},
 	}
 
 	getMinutesAgo = (milliseconds) => {
@@ -44,7 +54,16 @@ export default class Panel extends PureComponent {
 
 		return (
 			<div>
-				<B.Panel header={`Статистика: всего - ${positionedWarriors.length || ''}`} bsStyle="primary">
+				<B.Panel
+					header={`Статистика: всего - ${positionedWarriors.length || ''}`}
+					bsStyle="primary"
+					onClick={() => this.props.toggleCollapse('stats')}
+				/>
+				<B.Panel
+					bsStyle="primary"
+					expanded={!this.props.collapsed}
+					collapsible
+				>
 					<B.FormGroup className='app__panel'>
 						<table>
 							<thead>
@@ -55,7 +74,8 @@ export default class Panel extends PureComponent {
 									<td>Заряд</td>
 									<td>Точность</td>
 									<td>Статус</td>
-									<td>Ссылка</td>
+									<td>Отображение</td>
+									<td></td>
 									<td></td>
 								</tr>
 							</thead>
@@ -83,18 +103,18 @@ export default class Panel extends PureComponent {
 														height='15px'
 													/>
 												</td>
-												<td>{warrior.name || NOTAVALIABLE}</td>
+												<td>
+													<a href={warrior.url} target='_blank'>
+														{warrior.name || NOTAVALIABLE}
+													</a>
+												</td>
 												<td className={style.timeAgo}>{timeAgoString}</td>
 												<td className={style.batteryLevel}>{batteryLevel}</td>
 												<td className={style.accuracy}>{accuracy}</td>
 												<td className='app__panel-status'>{status}</td>
 												<td>
-													<B.Button
-														href={warrior.url}
-														bsStyle='link'
-														target='_blank'
-													>
-														<span role='img' aria-label='link'>&#x1F517;</span>
+													<B.Button onClick={() => this.props.toggleHideWarrior({ key: warrior.key, value: warrior.hidden }) }>
+														{warrior.hidden ? 'Показать' : 'Скрыть'}
 													</B.Button>
 												</td>
 												{

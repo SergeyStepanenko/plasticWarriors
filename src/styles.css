@@ -72,6 +72,9 @@ td {
 .app__header-select-map {
   width: 160px !important; }
 
+.panel {
+  margin-bottom: 0px !important; }
+
 .circle-picker {
   flex-flow: row;
   flex-wrap: nowrap !important;

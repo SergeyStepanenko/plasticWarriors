@@ -43,7 +43,13 @@ export default class WarriorForm extends PureComponent {
 		handleFormChange: PropTypes.func.isRequired,
 		handleColorPick: PropTypes.func.isRequired,
 		handleSubmit: PropTypes.func.isRequired,
+		toggleCollapse: PropTypes.func.isRequired,
 		handleFormReset: PropTypes.func,
+		collapsed: PropTypes.bool,
+	}
+
+	static defaultProps = {
+		collapsed: false,
 	}
 
 	render() {
@@ -58,7 +64,16 @@ export default class WarriorForm extends PureComponent {
 
 		return (
 			<B.Form horizontal>
-				<B.Panel header={CONSTANTS[form.type].header} bsStyle="primary">
+				<B.Panel
+					header={CONSTANTS[form.type].header}
+					bsStyle="primary"
+					onClick={() => this.props.toggleCollapse('warriorForm')}
+				/>
+				<B.Panel
+					bsStyle="primary"
+					expanded={!this.props.collapsed}
+					collapsible
+				>
 					<B.Col md={4}>
 						<B.FormGroup>
 							<B.Col md={12}>

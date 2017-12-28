@@ -117,7 +117,7 @@ export default class Stats extends PureComponent {
 													<ToggleButton
 														value={!warrior.hidden}
 														onToggle={(value) => {
-															this.props.toggleHideWarrior({ key: warrior.key, value });
+															this.props.toggleHideWarrior({ key: warrior.key, value: !value });
 														}}
 													/>
 												</td>

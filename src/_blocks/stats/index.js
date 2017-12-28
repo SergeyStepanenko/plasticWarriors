@@ -75,7 +75,7 @@ export default class Stats extends PureComponent {
 									<td>Заряд</td>
 									<td>Точность</td>
 									<td>Статус</td>
-									<td>Отображение</td>
+									<td>Показ</td>
 									<td></td>
 									<td></td>
 								</tr>

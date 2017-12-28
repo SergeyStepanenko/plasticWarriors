@@ -20,7 +20,16 @@ export default class Warriors extends PureComponent {
 		iconSize: PropTypes.number,
 	}
 
-	sorting = (a, b) => COLORS.indexOf(a.color) - COLORS.indexOf(b.color);
+	sorting = (a, b) => {
+		const first = COLORS.indexOf(a.color);
+		const second = COLORS.indexOf(b.color);
+
+		if (first === second) {
+			return (first + a.batteryLvl) - (second + b.batteryLvl);
+		}
+
+		return first - second;
+	}
 
 	render() {
 		const { iconSize, positionedWarriors } = this.props;

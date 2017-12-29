@@ -39,7 +39,7 @@ const formInitialState = {
 
 export default class WarriorForm extends PureComponent {
 	static propTypes = {
-		// form: PropTypes.object,
+		form: PropTypes.object,
 		// handleFormChange: PropTypes.func.isRequired,
 		// handleColorPick: PropTypes.func.isRequired,
 		// handleSubmit: PropTypes.func.isRequired,
@@ -54,6 +54,12 @@ export default class WarriorForm extends PureComponent {
 
 	state = {
 		form: formInitialState,
+	}
+
+	componentWillReceiveProps(nextProps) {
+		if (nextProps.form) {
+			this.setState({ form: nextProps.form });
+		}
 	}
 
 	handleColorPick = (color) => {
@@ -78,6 +84,8 @@ export default class WarriorForm extends PureComponent {
 		});
 	}
 
+	handleFormReset = () => this.setState({ form: formInitialState });
+
 	handleSubmit = (key) => {
 		this.sendUnitToFirebase({
 			key,
@@ -87,6 +95,7 @@ export default class WarriorForm extends PureComponent {
 		});
 
 		this.resetForm();
+		this.props.clearState('form');
 	}
 
 	sendUnitToFirebase = ({ key, name, url, color }) => {

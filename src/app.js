@@ -41,6 +41,7 @@ export default class App extends PureComponent {
 		modal: {
 			type: '',
 		},
+		form: null,
 		imgParams: {
 			height: 0,
 		},
@@ -325,6 +326,8 @@ export default class App extends PureComponent {
 		});
 	}
 
+	clearState = (value) => this.setState({ [value]: null });
+
 	render() {
 		const {
 			units,
@@ -404,8 +407,10 @@ export default class App extends PureComponent {
 				<B.Row>
 					<WarriorForm
 						form={form}
+						editWarrior={this.editWarrior}
 						toggleCollapse={this.toggleCollapse}
 						collapsed={this.state.expanded.warriorForm}
+						clearState={this.clearState}
 					/>
 				</B.Row>
 				<B.Row>

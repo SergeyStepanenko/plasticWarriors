@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import * as B from 'react-bootstrap';
 import { CirclePicker } from 'react-color';
-import { isEqual, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 
 import { unitsRef } from 'config/firebase';
 import { requestData } from 'helpers';
@@ -11,7 +11,7 @@ import { COLORS } from 'constants/index';
 const URL = 'https://www.izhforum.info/forum/izhevsk/tracker_live_map.php';
 const CONSTANTS = {
 	add: {
-		header: 'Добавление юнита:',
+		header: 'Добавление воина:',
 		name: 'Имя воина',
 		enterName: 'Введите имя воина',
 		link: 'Ссылка из trackKids',
@@ -57,7 +57,7 @@ export default class WarriorForm extends PureComponent {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		if (nextProps.form && !isEqual(this.props.form, nextProps.form)) {
+		if (nextProps.form) {
 			this.setState({ form: nextProps.form });
 		}
 	}
@@ -66,6 +66,7 @@ export default class WarriorForm extends PureComponent {
 		if (!color) {
 			return;
 		}
+
 		this.setState({
 			form: {
 				...this.state.form,
@@ -85,7 +86,7 @@ export default class WarriorForm extends PureComponent {
 		});
 	}
 
-	handleFormReset = () => this.setState({ form: formInitialState });
+	resetForm = () => this.setState({ form: formInitialState });
 
 	handleSubmit = async () => {
 		this.setState({
@@ -98,7 +99,7 @@ export default class WarriorForm extends PureComponent {
 		if (!isValidLink) {
 			this.setState({
 				disabled: false,
-				statusText: `Ссылка не начинается с ${URL}`,
+				statusText: `Ссылка начинается не с ${URL}`,
 			});
 
 			return;
@@ -150,18 +151,14 @@ export default class WarriorForm extends PureComponent {
 		}
 	}
 
-	resetForm = () => {
-		this.setState({
-			form: formInitialState,
-		});
-	}
+	resetForm = () => this.setState({ form: formInitialState });
 
 	render() {
 		const { form } = this.state;
 		const isFormCompleted = !!~Object.values(form).indexOf('');
-
+		const { toggleCollapse } = this.props;
 		const editButton = (this.state.form.type === 'edit') ?
-			<B.Button onClick={() => this.handleFormReset()}>
+			<B.Button onClick={() => this.resetForm()}>
 				{CONSTANTS[this.state.form.type].reset}
 			</B.Button>
 			: null;
@@ -171,7 +168,7 @@ export default class WarriorForm extends PureComponent {
 				<B.Panel
 					header={CONSTANTS[form.type].header}
 					bsStyle="primary"
-					onClick={() => this.props.toggleCollapse('warriorForm')}
+					onClick={() =>toggleCollapse && this.props.toggleCollapse('warriorForm')}
 				/>
 				<B.Panel
 					bsStyle="primary"

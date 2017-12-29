@@ -11,7 +11,7 @@ ReactDOM.render(
 	<BrowserRouter>
 		<div>
 			<Route exact path="/" component={App}/>
-			<Route path="/add" component={WarriorAddPage}/>
+			<Route path="/addUnit" component={WarriorAddPage}/>
 		</div>
 	</BrowserRouter>,
 	document.getElementById('root'));

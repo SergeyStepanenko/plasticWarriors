@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import * as B from 'react-bootstrap';
 import { CirclePicker } from 'react-color';
 
+import { unitsRef } from 'config/firebase';
+
 import { COLORS } from 'constants/index';
 
 const CONSTANTS = {
@@ -55,6 +57,26 @@ export default class WarriorForm extends PureComponent {
 		collapsed: false,
 	}
 
+	// toggleCollapse = (block) => {
+	// 	this.setState(prevState => ({
+	// 		collapsed: !prevState.collapsed,
+	// 	}), () => {
+	// 		localStorage[block] = this.state.expanded[block];
+	// 	});
+	// }
+
+	handleColorPick = (color) => {
+		if (!color) {
+			return;
+		}
+		this.setState({
+			form: {
+				...this.state.form,
+				color: color.hex,
+			}
+		});
+	};
+
 	handleFormChange = (field, event) => {
 		event.preventDefault();
 		this.setState({
@@ -65,6 +87,39 @@ export default class WarriorForm extends PureComponent {
 		});
 	}
 
+	handleSubmit = (key) => {
+		this.sendUnitToFirebase({
+			key,
+			name: this.state.form.name.trim(),
+			url: this.state.form.url.trim(),
+			color: this.state.form.color,
+		});
+
+		this.resetForm();
+	}
+
+	sendUnitToFirebase = ({ key, name, url, color }) => {
+		const postData = {
+			name,
+			url,
+			color,
+		};
+
+		if (!key) {
+			unitsRef.push().set(postData);
+		} else {
+			const updates = {};
+			updates[key] = postData;
+
+			unitsRef.update(updates);
+		}
+	}
+
+	resetForm = () => {
+		this.setState({
+			form: formInitialState,
+		});
+	}
 
 	render() {
 		const { form } = this.state;

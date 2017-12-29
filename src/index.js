@@ -1,21 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {
-	BrowserRouter as Router,
-	Route,
-} from 'react-router-dom';
-import './styles.css';
-import App from './app';
+import { BrowserRouter, Route } from 'react-router-dom';
 import registerServiceWorker from './registerServiceWorker';
 
+import App from './app';
 import { WarriorAddPage } from 'pages';
+import './styles.css';
 
 ReactDOM.render(
-	<Router>
+	<BrowserRouter>
 		<div>
 			<Route exact path="/" component={App}/>
 			<Route path="/add" component={WarriorAddPage}/>
 		</div>
-	</Router>,
+	</BrowserRouter>,
 	document.getElementById('root'));
 registerServiceWorker();

@@ -2,12 +2,13 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import * as B from 'react-bootstrap';
 import { CirclePicker } from 'react-color';
-import { isEqual } from 'lodash';
+import { isEqual, isEmpty } from 'lodash';
 
 import { unitsRef } from 'config/firebase';
-
+import { requestData } from 'helpers';
 import { COLORS } from 'constants/index';
 
+const URL = 'https://www.izhforum.info/forum/izhevsk/tracker_live_map.php';
 const CONSTANTS = {
 	add: {
 		header: 'Добавление юнита:',
@@ -52,6 +53,7 @@ export default class WarriorForm extends PureComponent {
 
 	state = {
 		form: formInitialState,
+		statusText: '',
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -78,21 +80,54 @@ export default class WarriorForm extends PureComponent {
 			form: {
 				...this.state.form,
 				[field]: event.target.value
-			}
+			},
+			statusText: '',
 		});
 	}
 
 	handleFormReset = () => this.setState({ form: formInitialState });
 
-	handleSubmit = (key) => {
+	handleSubmit = async () => {
+		this.setState({
+			disabled: true,
+			statusText: 'Проверка',
+		});
+
+		const isValidLink = this.state.form.url.startsWith(URL);
+
+		if (!isValidLink) {
+			this.setState({
+				disabled: false,
+				statusText: `Ссылка не начинается с ${URL}`,
+			});
+
+			return;
+		}
+
+		const response = await requestData({ url: this.state.form.url });
+
+		if (!response || isEmpty(response)) {
+			this.setState({
+				disabled: false,
+				statusText: 'Неверная ссылка',
+			});
+
+			return;
+		}
+
 		this.sendUnitToFirebase({
-			key,
+			key: this.state.form.key,
 			name: this.state.form.name.trim(),
 			url: this.state.form.url.trim(),
 			color: this.state.form.color,
 		});
-		this.resetForm();
 
+		this.setState({
+			disabled: false,
+			statusText: 'Ок',
+		});
+
+		this.resetForm();
 
 		const { clearState } = this.props;
 		this.props.form && clearState && clearState('form');
@@ -174,13 +209,14 @@ export default class WarriorForm extends PureComponent {
 								/>
 								<div className='app__form-buttons'>
 									<B.Button
-										onClick={() => this.handleSubmit(form.key)}
-										disabled={isFormCompleted}
+										onClick={this.handleSubmit}
+										disabled={isFormCompleted || this.state.disabled}
 									>
 										{CONSTANTS[form.type].submit}
 									</B.Button>
 									{editButton}
 								</div>
+								<span>{this.state.statusText}</span>
 							</B.Col>
 						</B.FormGroup>
 					</B.Col>

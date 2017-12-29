@@ -27,28 +27,52 @@ const CONSTANTS = {
 	}
 };
 
+const formInitialState = {
+	name: '',
+	url: '',
+	color: '',
+	key: null,
+	type: 'add',
+};
+
 export default class WarriorForm extends PureComponent {
 	static propTypes = {
-		form: PropTypes.object.isRequired,
-		handleFormChange: PropTypes.func.isRequired,
-		handleColorPick: PropTypes.func.isRequired,
-		handleSubmit: PropTypes.func.isRequired,
-		toggleCollapse: PropTypes.func.isRequired,
-		handleFormReset: PropTypes.func,
-		collapsed: PropTypes.bool,
+		// form: PropTypes.object,
+		// handleFormChange: PropTypes.func.isRequired,
+		// handleColorPick: PropTypes.func.isRequired,
+		// handleSubmit: PropTypes.func.isRequired,
+		// toggleCollapse: PropTypes.func.isRequired,
+		// handleFormReset: PropTypes.func,
+		// collapsed: PropTypes.bool,
 	}
 
 	static defaultProps = {
 		collapsed: false,
 	}
 
+	state = {
+		form: formInitialState,
+		collapsed: false,
+	}
+
+	handleFormChange = (field, event) => {
+		event.preventDefault();
+		this.setState({
+			form: {
+				...this.state.form,
+				[field]: event.target.value
+			}
+		});
+	}
+
+
 	render() {
-		const { form } = this.props;
+		const { form } = this.state;
 		const isFormCompleted = !!~Object.values(form).indexOf('');
 
-		const editButton = (this.props.form.type === 'edit') ?
-			<B.Button onClick={() => this.props.handleFormReset()}>
-				{CONSTANTS[this.props.form.type].reset}
+		const editButton = (this.state.form.type === 'edit') ?
+			<B.Button onClick={() => this.handleFormReset()}>
+				{CONSTANTS[this.state.form.type].reset}
 			</B.Button>
 			: null;
 
@@ -57,11 +81,11 @@ export default class WarriorForm extends PureComponent {
 				<B.Panel
 					header={CONSTANTS[form.type].header}
 					bsStyle="primary"
-					onClick={() => this.props.toggleCollapse('warriorForm')}
+					onClick={() => this.toggleCollapse('warriorForm')}
 				/>
 				<B.Panel
 					bsStyle="primary"
-					expanded={!this.props.collapsed}
+					expanded={!this.state.collapsed}
 					collapsible
 				>
 					<B.Col md={4}>
@@ -70,7 +94,7 @@ export default class WarriorForm extends PureComponent {
 								<B.ControlLabel>{CONSTANTS[form.type].name}</B.ControlLabel>
 								<B.FormControl
 									placeholder={CONSTANTS[form.type].enterName}
-									onChange={(event) => this.props.handleFormChange('name', event)}
+									onChange={(event) => this.handleFormChange('name', event)}
 									value={form.name}
 								/>
 							</B.Col>
@@ -80,7 +104,7 @@ export default class WarriorForm extends PureComponent {
 								<B.ControlLabel>{CONSTANTS[form.type].link}</B.ControlLabel>
 								<B.FormControl
 									placeholder={CONSTANTS[form.type].enterLink}
-									onChange={(event) => this.props.handleFormChange('url', event)}
+									onChange={(event) => this.handleFormChange('url', event)}
 									value={form.url}
 								/>
 							</B.Col>
@@ -89,13 +113,13 @@ export default class WarriorForm extends PureComponent {
 									{CONSTANTS[form.type].pinColor}
 								</B.ControlLabel>
 								<CirclePicker
-									onChangeComplete={this.props.handleColorPick}
+									onChangeComplete={this.handleColorPick}
 									color={form.color}
 									colors={COLORS}
 								/>
 								<div className='app__form-buttons'>
 									<B.Button
-										onClick={() => this.props.handleSubmit(form.key)}
+										onClick={() => this.handleSubmit(form.key)}
 										disabled={isFormCompleted}
 									>
 										{CONSTANTS[form.type].submit}

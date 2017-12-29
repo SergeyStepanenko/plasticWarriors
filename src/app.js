@@ -35,20 +35,20 @@ const database = firebase.database();
 const rootRef = database.ref('/');
 const unitsRef = database.ref('/units');
 const mapsRef = database.ref('/maps');
-const formInitialState = {
-	name: '',
-	url: '',
-	color: '',
-	key: null,
-	type: 'add',
-};
+// const formInitialState = {
+// 	name: '',
+// 	url: '',
+// 	color: '',
+// 	key: null,
+// 	type: 'add',
+// };
 
 export default class App extends PureComponent {
 	state = {
 		authentication: {
 			authenticated: false,
 		},
-		form: formInitialState,
+		// form: formInitialState,
 		units: {},
 		mappedWarriors: [],
 		positionedWarriors: [],
@@ -199,22 +199,22 @@ export default class App extends PureComponent {
 		});
 	}
 
-	handleSubmit = (key) => {
-		this.sendUnitToFirebase({
-			key,
-			name: this.state.form.name.trim(),
-			url: this.state.form.url.trim(),
-			color: this.state.form.color,
-		});
-
-		this.resetForm();
-	}
-
-	resetForm = () => {
-		this.setState({
-			form: formInitialState,
-		});
-	}
+	// handleSubmit = (key) => {
+	// 	this.sendUnitToFirebase({
+	// 		key,
+	// 		name: this.state.form.name.trim(),
+	// 		url: this.state.form.url.trim(),
+	// 		color: this.state.form.color,
+	// 	});
+    //
+	// 	this.resetForm();
+	// }
+    //
+	// resetForm = () => {
+	// 	this.setState({
+	// 		form: formInitialState,
+	// 	});
+	// }
 
 	calculatePosition = () => {
 		const imgParams = this.$image.getBoundingClientRect();
@@ -247,39 +247,39 @@ export default class App extends PureComponent {
 		});
 	}
 
-	sendUnitToFirebase = ({ key, name, url, color }) => {
-		const postData = {
-			name,
-			url,
-			color,
-		};
+	// sendUnitToFirebase = ({ key, name, url, color }) => {
+	// 	const postData = {
+	// 		name,
+	// 		url,
+	// 		color,
+	// 	};
+    //
+	// 	if (!key) {
+	// 		unitsRef.push().set(postData);
+	// 	} else {
+	// 		const updates = {};
+	// 		updates[key] = postData;
+    //
+	// 		unitsRef.update(updates);
+	// 	}
+	// }
+    //
+	// deleteUnitFromFirebase = (key) => {
+	// 	if (!key) {
+	// 		return;
+	// 	}
+	// 	database.ref(`/units/${key}`).remove();
+	// }
 
-		if (!key) {
-			unitsRef.push().set(postData);
-		} else {
-			const updates = {};
-			updates[key] = postData;
-
-			unitsRef.update(updates);
-		}
-	}
-
-	deleteUnitFromFirebase = (key) => {
-		if (!key) {
-			return;
-		}
-		database.ref(`/units/${key}`).remove();
-	}
-
-	handleFormChange = (field, event) => {
-		event.preventDefault();
-		this.setState({
-			form: {
-				...this.state.form,
-				[field]: event.target.value
-			}
-		});
-	}
+	// handleFormChange = (field, event) => {
+	// 	event.preventDefault();
+	// 	this.setState({
+	// 		form: {
+	// 			...this.state.form,
+	// 			[field]: event.target.value
+	// 		}
+	// 	});
+	// }
 
 	sendMapToFirebase = (data) => {
 		if (!data) {
@@ -302,17 +302,17 @@ export default class App extends PureComponent {
 		}, () => localStorage.setItem('selectedMap', mapId));
 	}
 
-	handleColorPick = (color) => {
-		if (!color) {
-			return;
-		}
-		this.setState({
-			form: {
-				...this.state.form,
-				color: color.hex,
-			}
-		});
-	};
+	// handleColorPick = (color) => {
+	// 	if (!color) {
+	// 		return;
+	// 	}
+	// 	this.setState({
+	// 		form: {
+	// 			...this.state.form,
+	// 			color: color.hex,
+	// 		}
+	// 	});
+	// };
 
 	editWarrior = ({ units, key }) => {
 		if (!units || !key) {
@@ -345,7 +345,7 @@ export default class App extends PureComponent {
 				key,
 				action: this.deleteUnitFromFirebase,
 			},
-			form: formInitialState,
+			// form: formInitialState,
 		});
 	}
 

@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import * as B from 'react-bootstrap';
 import { CirclePicker } from 'react-color';
+import { isEqual } from 'lodash';
 
 import { unitsRef } from 'config/firebase';
 
@@ -40,11 +41,8 @@ const formInitialState = {
 export default class WarriorForm extends PureComponent {
 	static propTypes = {
 		form: PropTypes.object,
-		// handleFormChange: PropTypes.func.isRequired,
-		// handleColorPick: PropTypes.func.isRequired,
-		// handleSubmit: PropTypes.func.isRequired,
 		toggleCollapse: PropTypes.func,
-		// handleFormReset: PropTypes.func,
+		clearState: PropTypes.func,
 		collapsed: PropTypes.bool,
 	}
 
@@ -57,7 +55,7 @@ export default class WarriorForm extends PureComponent {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		if (nextProps.form) {
+		if (nextProps.form && !isEqual(this.props.form, nextProps.form)) {
 			this.setState({ form: nextProps.form });
 		}
 	}
@@ -93,9 +91,11 @@ export default class WarriorForm extends PureComponent {
 			url: this.state.form.url.trim(),
 			color: this.state.form.color,
 		});
-
 		this.resetForm();
-		this.props.clearState('form');
+
+
+		const { clearState } = this.props;
+		this.props.form && clearState && clearState('form');
 	}
 
 	sendUnitToFirebase = ({ key, name, url, color }) => {

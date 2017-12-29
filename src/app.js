@@ -4,7 +4,7 @@ import 'bootstrap/dist/css/bootstrap-theme.css';
 import * as B from 'react-bootstrap';
 import { isEqual } from 'lodash';
 
-import firebase, { provider, rootRef, mapsRef, configRef } from 'config/firebase';
+import firebase, { provider, database, rootRef, mapsRef, configRef } from 'config/firebase';
 import {
 	Modal,
 	WarriorForm,
@@ -240,7 +240,9 @@ export default class App extends PureComponent {
 				type: 'edit',
 			},
 		}, () => {
-			this.toggleCollapse('warriorForm');
+			if (this.state.expanded.warriorForm) {
+				this.toggleCollapse('warriorForm');
+			}
 		});
 	}
 
@@ -266,6 +268,13 @@ export default class App extends PureComponent {
 				show: false,
 			}
 		});
+	}
+
+	deleteUnitFromFirebase = (key) => {
+		if (!key) {
+			return;
+		}
+		database.ref(`/units/${key}`).remove();
 	}
 
 	resize = (flag) => {
@@ -395,10 +404,6 @@ export default class App extends PureComponent {
 				<B.Row>
 					<WarriorForm
 						form={form}
-						handleFormChange={this.handleFormChange}
-						handleSubmit={this.handleSubmit}
-						handleColorPick={this.handleColorPick}
-						handleFormReset={this.resetForm}
 						toggleCollapse={this.toggleCollapse}
 						collapsed={this.state.expanded.warriorForm}
 					/>

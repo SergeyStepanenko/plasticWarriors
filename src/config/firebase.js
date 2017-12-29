@@ -11,15 +11,13 @@ const config = {
 
 
 const initializedFirebase = !firebase.apps.length ? firebase.initializeApp(config) : firebase.app();
+firebase.auth().languageCode = 'ru';
 
 export const provider = new firebase.auth.GoogleAuthProvider();
-
-const database = firebase.database();
+export const database = firebase.database();
 export const mapsRef = database.ref('/maps');
 export const rootRef = database.ref('/');
 export const unitsRef = database.ref('/units');
 export const configRef = database.ref('/config/counter');
-
-firebase.auth().languageCode = 'ru';
 
 export default initializedFirebase;

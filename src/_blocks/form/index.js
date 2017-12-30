@@ -2,12 +2,16 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import * as B from 'react-bootstrap';
 import { CirclePicker } from 'react-color';
+import { isEmpty } from 'lodash';
 
+import { unitsRef } from 'config/firebase';
+import { requestData } from 'helpers';
 import { COLORS } from 'constants/index';
 
+const URL = 'https://www.izhforum.info/forum/izhevsk/tracker_live_map.php';
 const CONSTANTS = {
 	add: {
-		header: 'Добавление юнита:',
+		header: 'Добавление воина:',
 		name: 'Имя воина',
 		enterName: 'Введите имя воина',
 		link: 'Ссылка из trackKids',
@@ -27,14 +31,19 @@ const CONSTANTS = {
 	}
 };
 
+const formInitialState = {
+	name: '',
+	url: '',
+	color: '',
+	key: null,
+	type: 'add',
+};
+
 export default class WarriorForm extends PureComponent {
 	static propTypes = {
-		form: PropTypes.object.isRequired,
-		handleFormChange: PropTypes.func.isRequired,
-		handleColorPick: PropTypes.func.isRequired,
-		handleSubmit: PropTypes.func.isRequired,
-		toggleCollapse: PropTypes.func.isRequired,
-		handleFormReset: PropTypes.func,
+		form: PropTypes.object,
+		toggleCollapse: PropTypes.func,
+		clearState: PropTypes.func,
 		collapsed: PropTypes.bool,
 	}
 
@@ -42,13 +51,115 @@ export default class WarriorForm extends PureComponent {
 		collapsed: false,
 	}
 
-	render() {
-		const { form } = this.props;
-		const isFormCompleted = !!~Object.values(form).indexOf('');
+	state = {
+		form: formInitialState,
+		statusText: '',
+	}
 
-		const editButton = (this.props.form.type === 'edit') ?
-			<B.Button onClick={() => this.props.handleFormReset()}>
-				{CONSTANTS[this.props.form.type].reset}
+	componentWillReceiveProps(nextProps) {
+		if (nextProps.form) {
+			this.setState({ form: nextProps.form });
+		}
+	}
+
+	handleColorPick = (color) => {
+		if (!color) {
+			return;
+		}
+
+		this.setState({
+			form: {
+				...this.state.form,
+				color: color.hex,
+			}
+		});
+	};
+
+	handleFormChange = (field, event) => {
+		event.preventDefault();
+		this.setState({
+			form: {
+				...this.state.form,
+				[field]: event.target.value
+			},
+			statusText: '',
+		});
+	}
+
+	resetForm = () => this.setState({ form: formInitialState });
+
+	handleSubmit = async () => {
+		this.setState({
+			disabled: true,
+			statusText: 'Проверка',
+		});
+
+		const isValidLink = this.state.form.url.startsWith(URL);
+
+		if (!isValidLink) {
+			this.setState({
+				disabled: false,
+				statusText: `Ссылка начинается не с ${URL}`,
+			});
+
+			return;
+		}
+
+		const response = await requestData({ url: this.state.form.url });
+
+		if (!response || isEmpty(response)) {
+			this.setState({
+				disabled: false,
+				statusText: 'Неверная ссылка',
+			});
+
+			return;
+		}
+
+		this.sendUnitToFirebase({
+			key: this.state.form.key,
+			name: this.state.form.name.trim(),
+			url: this.state.form.url.trim(),
+			color: this.state.form.color,
+		});
+
+		this.setState({
+			disabled: false,
+			statusText: 'Ок',
+		});
+
+		this.resetForm();
+
+		const { clearState } = this.props;
+		this.props.form && clearState && clearState('form');
+	}
+
+	sendUnitToFirebase = ({ key, name, url, color }) => {
+		const postData = {
+			name,
+			url,
+			color,
+		};
+
+		if (!key) {
+			unitsRef.push().set(postData);
+		} else {
+			const updates = {};
+			updates[key] = postData;
+
+			unitsRef.update(updates);
+		}
+	}
+
+	resetForm = () => this.setState({ form: formInitialState });
+
+	render() {
+		const { form } = this.state;
+		const isFormCompleted = !!~Object.values(form).indexOf('');
+		const { toggleCollapse } = this.props;
+		const editButton = (this.state.form.type === 'edit') ?
+			<B.Button onClick={() => this.resetForm()}>
+				{CONSTANTS[this.state.form.type].reset}
 			</B.Button>
 			: null;
 
@@ -57,7 +168,7 @@ export default class WarriorForm extends PureComponent {
 				<B.Panel
 					header={CONSTANTS[form.type].header}
 					bsStyle="primary"
-					onClick={() => this.props.toggleCollapse('warriorForm')}
+					onClick={() =>toggleCollapse && this.props.toggleCollapse('warriorForm')}
 				/>
 				<B.Panel
 					bsStyle="primary"
@@ -70,7 +181,7 @@ export default class WarriorForm extends PureComponent {
 								<B.ControlLabel>{CONSTANTS[form.type].name}</B.ControlLabel>
 								<B.FormControl
 									placeholder={CONSTANTS[form.type].enterName}
-									onChange={(event) => this.props.handleFormChange('name', event)}
+									onChange={(event) => this.handleFormChange('name', event)}
 									value={form.name}
 								/>
 							</B.Col>
@@ -80,7 +191,7 @@ export default class WarriorForm extends PureComponent {
 								<B.ControlLabel>{CONSTANTS[form.type].link}</B.ControlLabel>
 								<B.FormControl
 									placeholder={CONSTANTS[form.type].enterLink}
-									onChange={(event) => this.props.handleFormChange('url', event)}
+									onChange={(event) => this.handleFormChange('url', event)}
 									value={form.url}
 								/>
 							</B.Col>
@@ -89,19 +200,20 @@ export default class WarriorForm extends PureComponent {
 									{CONSTANTS[form.type].pinColor}
 								</B.ControlLabel>
 								<CirclePicker
-									onChangeComplete={this.props.handleColorPick}
+									onChangeComplete={this.handleColorPick}
 									color={form.color}
 									colors={COLORS}
 								/>
 								<div className='app__form-buttons'>
 									<B.Button
-										onClick={() => this.props.handleSubmit(form.key)}
-										disabled={isFormCompleted}
+										onClick={this.handleSubmit}
+										disabled={isFormCompleted || this.state.disabled}
 									>
 										{CONSTANTS[form.type].submit}
 									</B.Button>
 									{editButton}
 								</div>
+								<span>{this.state.statusText}</span>
 							</B.Col>
 						</B.FormGroup>
 					</B.Col>

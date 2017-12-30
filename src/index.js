@@ -1,8 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './styles.css';
-import App from './app';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import registerServiceWorker from './registerServiceWorker';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+import App from './app';
+import { WarriorAddPage } from 'pages';
+import './styles.css';
+
+ReactDOM.render(
+	<BrowserRouter>
+		<Switch>
+			<Route exact path='/' component={App}/>
+			<Route path='/add' component={WarriorAddPage}/>
+		</Switch>
+	</BrowserRouter>,
+	document.getElementById('root'));
 registerServiceWorker();

@@ -1,10 +1,10 @@
 import React, { PureComponent } from 'react';
-import * as firebase from 'firebase';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/css/bootstrap-theme.css';
 import * as B from 'react-bootstrap';
 import { isEqual } from 'lodash';
 
+import firebase, { provider, database, rootRef, mapsRef, configRef } from 'config/firebase';
 import {
 	Modal,
 	WarriorForm,
@@ -14,41 +14,17 @@ import {
 } from '_blocks';
 import { premissionRequest } from './config/roles';
 import resetSVG from 'assets/icons/spinner.svg';
-
-const config = {
-	apiKey: 'AIzaSyCB1TfuGQegOrHOPcFJFqpxDmMTSElXQVg',
-	authDomain: 'plastic-warriors.firebaseapp.com',
-	databaseURL: 'https://plastic-warriors.firebaseio.com',
-	projectId: 'plastic-warriors',
-	storageBucket: '',
-	messagingSenderId: '143541315246',
-};
-
-firebase.initializeApp(config);
-firebase.auth().languageCode = 'ru';
-
-const provider = new firebase.auth.GoogleAuthProvider();
-const ICONSIZE = 15;
-const ICONRESIZESTEP = 2;
-const SHIFTYAXIS = '40px';
-const database = firebase.database();
-const rootRef = database.ref('/');
-const unitsRef = database.ref('/units');
-const mapsRef = database.ref('/maps');
-const formInitialState = {
-	name: '',
-	url: '',
-	color: '',
-	key: null,
-	type: 'add',
-};
+import {
+	ICONSIZE,
+	ICONRESIZESTEP,
+	SHIFTYAXIS,
+} from 'constants/index';
 
 export default class App extends PureComponent {
 	state = {
 		authentication: {
 			authenticated: false,
 		},
-		form: formInitialState,
 		units: {},
 		mappedWarriors: [],
 		positionedWarriors: [],
@@ -65,6 +41,7 @@ export default class App extends PureComponent {
 		modal: {
 			type: '',
 		},
+		form: null,
 		imgParams: {
 			height: 0,
 		},
@@ -192,27 +169,9 @@ export default class App extends PureComponent {
 	}
 
 	refreshData = () => {
-		const configRef = database.ref('/config/counter');
 		configRef.once('value').then((snap) => {
 			let counter = snap.val();
 			configRef.set(++counter);
-		});
-	}
-
-	handleSubmit = (key) => {
-		this.sendUnitToFirebase({
-			key,
-			name: this.state.form.name.trim(),
-			url: this.state.form.url.trim(),
-			color: this.state.form.color,
-		});
-
-		this.resetForm();
-	}
-
-	resetForm = () => {
-		this.setState({
-			form: formInitialState,
 		});
 	}
 
@@ -247,40 +206,6 @@ export default class App extends PureComponent {
 		});
 	}
 
-	sendUnitToFirebase = ({ key, name, url, color }) => {
-		const postData = {
-			name,
-			url,
-			color,
-		};
-
-		if (!key) {
-			unitsRef.push().set(postData);
-		} else {
-			const updates = {};
-			updates[key] = postData;
-
-			unitsRef.update(updates);
-		}
-	}
-
-	deleteUnitFromFirebase = (key) => {
-		if (!key) {
-			return;
-		}
-		database.ref(`/units/${key}`).remove();
-	}
-
-	handleFormChange = (field, event) => {
-		event.preventDefault();
-		this.setState({
-			form: {
-				...this.state.form,
-				[field]: event.target.value
-			}
-		});
-	}
-
 	sendMapToFirebase = (data) => {
 		if (!data) {
 			return;
@@ -302,18 +227,6 @@ export default class App extends PureComponent {
 		}, () => localStorage.setItem('selectedMap', mapId));
 	}
 
-	handleColorPick = (color) => {
-		if (!color) {
-			return;
-		}
-		this.setState({
-			form: {
-				...this.state.form,
-				color: color.hex,
-			}
-		});
-	};
-
 	editWarrior = ({ units, key }) => {
 		if (!units || !key) {
 			return;
@@ -328,7 +241,9 @@ export default class App extends PureComponent {
 				type: 'edit',
 			},
 		}, () => {
-			this.toggleCollapse('warriorForm');
+			if (this.state.expanded.warriorForm) {
+				this.toggleCollapse('warriorForm');
+			}
 		});
 	}
 
@@ -345,7 +260,6 @@ export default class App extends PureComponent {
 				key,
 				action: this.deleteUnitFromFirebase,
 			},
-			form: formInitialState,
 		});
 	}
 
@@ -355,6 +269,13 @@ export default class App extends PureComponent {
 				show: false,
 			}
 		});
+	}
+
+	deleteUnitFromFirebase = (key) => {
+		if (!key) {
+			return;
+		}
+		database.ref(`/units/${key}`).remove();
 	}
 
 	resize = (flag) => {
@@ -404,6 +325,8 @@ export default class App extends PureComponent {
 			positionedWarriors: clone,
 		});
 	}
+
+	clearState = (value) => this.setState({ [value]: null });
 
 	render() {
 		const {
@@ -484,12 +407,10 @@ export default class App extends PureComponent {
 				<B.Row>
 					<WarriorForm
 						form={form}
-						handleFormChange={this.handleFormChange}
-						handleSubmit={this.handleSubmit}
-						handleColorPick={this.handleColorPick}
-						handleFormReset={this.resetForm}
+						editWarrior={this.editWarrior}
 						toggleCollapse={this.toggleCollapse}
 						collapsed={this.state.expanded.warriorForm}
+						clearState={this.clearState}
 					/>
 				</B.Row>
 				<B.Row>

@@ -22,6 +22,7 @@
     "eslint-plugin-import": "^2.8.0",
     "eslint-plugin-react": "^7.5.1",
     "firebase": "^4.7.0",
+    "gh-pages": "^1.1.0",
     "lodash": "^4.17.4",
     "moment": "^2.19.4",
     "node-sass-chokidar": "0.0.3",
@@ -30,6 +31,7 @@
     "react-bootstrap": "^0.31.5",
     "react-color": "^2.13.8",
     "react-dom": "^16.2.0",
+    "react-router-dom": "^4.2.2",
     "react-scripts": "1.0.17",
     "react-toggle-button": "^2.2.0"
   }

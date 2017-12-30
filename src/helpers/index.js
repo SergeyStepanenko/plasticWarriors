@@ -1,4 +1,6 @@
-export const requestData = ({ CORS, url, key, ...rest }) => {
+const CORS = 'https://cors-anywhere.herokuapp.com/';
+
+export const requestData = ({ url }) => {
 	return new Promise((resolve, reject) => {
 		const xhr = new XMLHttpRequest();
 		const wrappedUrl = `${CORS}${url}&mode=poll`;
@@ -13,22 +15,12 @@ export const requestData = ({ CORS, url, key, ...rest }) => {
 				} catch (e) {
 					console.error('JSON.parse error', e); // eslint-disable-line
 				} finally {
-					resolve({
-						...response,
-						...rest,
-						key,
-						url,
-					});
+					resolve(response);
 				}
 			} else {
 				const error = new Error(this.statusText);
 				error.code = this.status;
-				reject({
-					...rest,
-					key,
-					url,
-					error
-				});
+				reject(error);
 			}
 		};
 

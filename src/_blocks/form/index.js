@@ -155,8 +155,9 @@ export default class WarriorForm extends PureComponent {
 
 	render() {
 		const { form } = this.state;
-		const isFormCompleted = !!~Object.values(form).indexOf('');
 		const { toggleCollapse } = this.props;
+		const isFormCompleted = !!~Object.values(form).indexOf('');
+		// const isFormCompleted = !!~Object.keys(form).map(value => form[value]).indexOf('');
 		const editButton = (form.type === 'edit') ?
 			<B.Button onClick={() => this.resetForm()}>
 				{CONSTANTS[form.type].reset}

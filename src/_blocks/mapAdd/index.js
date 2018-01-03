@@ -41,6 +41,7 @@ export default class MapAddForm extends PureComponent {
 	render() {
 		const { form } = this.state;
 		const isFormCompleted = !!~Object.values(form).indexOf('');
+		// const isFormCompleted = !!~Object.keys(form).map(value => form[value]).indexOf('');
 
 		return (
 			<B.Form horizontal>

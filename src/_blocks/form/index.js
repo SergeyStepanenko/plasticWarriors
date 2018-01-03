@@ -157,9 +157,9 @@ export default class WarriorForm extends PureComponent {
 		const { form } = this.state;
 		const isFormCompleted = !!~Object.values(form).indexOf('');
 		const { toggleCollapse } = this.props;
-		const editButton = (this.state.form.type === 'edit') ?
+		const editButton = (form.type === 'edit') ?
 			<B.Button onClick={() => this.resetForm()}>
-				{CONSTANTS[this.state.form.type].reset}
+				{CONSTANTS[form.type].reset}
 			</B.Button>
 			: null;
 
@@ -168,7 +168,7 @@ export default class WarriorForm extends PureComponent {
 				<B.Panel
 					header={CONSTANTS[form.type].header}
 					bsStyle="primary"
-					onClick={() =>toggleCollapse && this.props.toggleCollapse('warriorForm')}
+					onClick={() => toggleCollapse && this.props.toggleCollapse('warriorForm')}
 				/>
 				<B.Panel
 					bsStyle="primary"

@@ -75,7 +75,7 @@ export default class WarriorForm extends PureComponent {
 		});
 	};
 
-	handleFormChange = (field, event) => {
+	handleFormFill = (field, event) => {
 		event.preventDefault();
 		this.setState({
 			form: {
@@ -88,13 +88,15 @@ export default class WarriorForm extends PureComponent {
 
 	resetForm = () => this.setState({ form: formInitialState });
 
-	handleSubmit = async () => {
+	handleURLValidationProcess = async () => {
+		const { form } = this.state;
+
 		this.setState({
 			disabled: true,
 			statusText: 'Проверка',
 		});
 
-		const isValidLink = this.state.form.url.startsWith(URL);
+		const isValidLink = form.url.startsWith(URL);
 
 		if (!isValidLink) {
 			this.setState({
@@ -102,10 +104,10 @@ export default class WarriorForm extends PureComponent {
 				statusText: `Ссылка начинается не с ${URL}`,
 			});
 
-			return;
+			return Promise.reject();
 		}
 
-		const response = await requestData({ url: this.state.form.url });
+		const response = await requestData({ url: form.url });
 
 		if (!response || isEmpty(response)) {
 			this.setState({
@@ -113,14 +115,26 @@ export default class WarriorForm extends PureComponent {
 				statusText: 'Неверная ссылка',
 			});
 
+			return Promise.reject();
+		}
+
+		return Promise.resolve(true);
+	}
+
+	handleSubmit = async () => {
+		const isValid = await this.handleURLValidationProcess();
+
+		if (!isValid) {
 			return;
 		}
 
+		const { form } = this.state;
+
 		this.sendUnitToFirebase({
-			key: this.state.form.key,
-			name: this.state.form.name.trim(),
-			url: this.state.form.url.trim(),
-			color: this.state.form.color,
+			key: form.key,
+			name: form.name.trim(),
+			url: form.url.trim(),
+			color: form.color,
 		});
 
 		this.setState({
@@ -129,9 +143,6 @@ export default class WarriorForm extends PureComponent {
 		});
 
 		this.resetForm();
-
-		const { clearState } = this.props;
-		this.props.form && clearState && clearState('form');
 	}
 
 	sendUnitToFirebase = ({ key, name, url, color }) => {
@@ -151,15 +162,24 @@ export default class WarriorForm extends PureComponent {
 		}
 	}
 
-	resetForm = () => this.setState({ form: formInitialState });
+	resetForm = () => {
+		const { clearState, form } = this.props;
+
+		if (form && clearState) {
+			clearState('form');
+		} else {
+			this.setState({ form: formInitialState });
+		}
+	}
 
 	render() {
-		const { form } = this.state;
-		const isFormCompleted = !!~Object.values(form).indexOf('');
+		const { form, disabled } = this.state;
 		const { toggleCollapse } = this.props;
-		const editButton = (this.state.form.type === 'edit') ?
+		const isFormCompleted = Boolean(~Object.values(form).indexOf(''));
+		const isDisabled = isFormCompleted || disabled;
+		const editButton = (form.type === 'edit') ?
 			<B.Button onClick={() => this.resetForm()}>
-				{CONSTANTS[this.state.form.type].reset}
+				{CONSTANTS[form.type].reset}
 			</B.Button>
 			: null;
 
@@ -168,7 +188,7 @@ export default class WarriorForm extends PureComponent {
 				<B.Panel
 					header={CONSTANTS[form.type].header}
 					bsStyle="primary"
-					onClick={() =>toggleCollapse && this.props.toggleCollapse('warriorForm')}
+					onClick={() => toggleCollapse && this.props.toggleCollapse('warriorForm')}
 				/>
 				<B.Panel
 					bsStyle="primary"
@@ -181,7 +201,7 @@ export default class WarriorForm extends PureComponent {
 								<B.ControlLabel>{CONSTANTS[form.type].name}</B.ControlLabel>
 								<B.FormControl
 									placeholder={CONSTANTS[form.type].enterName}
-									onChange={(event) => this.handleFormChange('name', event)}
+									onChange={(event) => this.handleFormFill('name', event)}
 									value={form.name}
 								/>
 							</B.Col>
@@ -191,7 +211,7 @@ export default class WarriorForm extends PureComponent {
 								<B.ControlLabel>{CONSTANTS[form.type].link}</B.ControlLabel>
 								<B.FormControl
 									placeholder={CONSTANTS[form.type].enterLink}
-									onChange={(event) => this.handleFormChange('url', event)}
+									onChange={(event) => this.handleFormFill('url', event)}
 									value={form.url}
 								/>
 							</B.Col>
@@ -207,7 +227,7 @@ export default class WarriorForm extends PureComponent {
 								<div className='app__form-buttons'>
 									<B.Button
 										onClick={this.handleSubmit}
-										disabled={isFormCompleted || this.state.disabled}
+										disabled={isDisabled}
 									>
 										{CONSTANTS[form.type].submit}
 									</B.Button>

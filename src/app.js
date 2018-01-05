@@ -200,10 +200,12 @@ export default class App extends PureComponent {
 			return false;
 		}
 
-		this.setState({
-			positionedWarriors,
-			imgParams,
-		});
+		setTimeout(() => {
+			this.setState({
+				positionedWarriors,
+				imgParams,
+			});
+		}, 1000);
 	}
 
 	sendMapToFirebase = (data) => {
@@ -258,6 +260,7 @@ export default class App extends PureComponent {
 				type: 'delete',
 				show: true,
 				key,
+				itemName: this.state.units[key].name,
 				action: this.deleteUnitFromFirebase,
 			},
 		});
@@ -340,18 +343,22 @@ export default class App extends PureComponent {
 			selectedMapId,
 			iconSize,
 		} = this.state;
+
 		const {
 			authenticated,
 			admin,
 		} = this.state.authentication;
 
+		const modalConditional = (modal.show) ? (
+			<Modal
+				data={modal}
+				show={modal.show}
+				onHide={this.modalHide}
+			/>) : null;
+
 		return (
 			<div className='app'>
-				<Modal
-					config={modal}
-					show={modal.show}
-					onHide={this.modalHide}
-				/>
+				{modalConditional}
 				<div style={{ height: SHIFTYAXIS }} className='app__header'>
 					<div className='app__header-lable'>
 						Трекер

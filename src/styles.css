@@ -65,6 +65,8 @@ td {
     margin-top: 15px; }
   .app__form-button-long {
     width: 70px; }
+  .app__form-color-pick-block {
+    margin-top: 15px; }
 
 .control-label {
   white-space: nowrap; }

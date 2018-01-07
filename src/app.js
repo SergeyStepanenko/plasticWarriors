@@ -17,6 +17,7 @@ import { premissionRequest } from './config/roles';
 import {
 	ICONSIZE,
 	ICONRESIZESTEP,
+	SHIFTYAXIS,
 } from 'constants/index';
 
 export default class App extends PureComponent {
@@ -354,8 +355,7 @@ export default class App extends PureComponent {
 				data={modal}
 				show={modal.show}
 				onHide={this.modalHide}
-			/>)
-			: null;
+			/>) : null;
 
 		return (
 			<div className='app'>
@@ -363,17 +363,19 @@ export default class App extends PureComponent {
 				<Header
 					selectedMapId={selectedMapId}
 					authenticated={authenticated}
+					maps={maps}
 					resize={this.resize}
 					signIn={this.signIn}
 					signOut={this.signOut}
 					refreshData={this.refreshData}
-					maps={maps}
+					handleMapSelect={this.handleMapSelect}
 				/>
 				<B.Row>
 					<div className='app__map' ref={(r) => { this.$image = r; }}	>
 						<B.Image onLoad={this.calculatePosition} src={map.url} responsive />
 					</div>
 					<Warriors
+						shift={SHIFTYAXIS}
 						positionedWarriors={positionedWarriors}
 						iconSize={iconSize}
 					/>

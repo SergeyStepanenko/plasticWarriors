@@ -1,10 +1,8 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import * as B from 'react-bootstrap';
-
 import { PinSVG2 } from '../index';
 import { COLORS } from 'constants/index';
-import { SHIFTYAXIS } from 'constants/index';
 
 const tooltipStyles = {
 	display: 'flex',
@@ -18,6 +16,7 @@ export default class Warriors extends PureComponent {
 
 	static propTypes = {
 		positionedWarriors: PropTypes.array,
+		shift: PropTypes.string.isRequired,
 		iconSize: PropTypes.number,
 	}
 
@@ -45,8 +44,9 @@ export default class Warriors extends PureComponent {
 							width: `${iconSize}px`,
 							height: `${iconSize}px`,
 							transform: shiftOnMap,
-							marginTop: SHIFTYAXIS, // shift as per header height
+							marginTop: this.props.shift, // shift as per header height
 						};
+
 
 						const tooltip = (
 							<B.Tooltip id="tooltip" style={tooltipStyles}>

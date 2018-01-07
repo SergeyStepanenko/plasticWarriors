@@ -206,7 +206,7 @@ export default class WarriorForm extends PureComponent {
 								/>
 							</B.Col>
 						</B.FormGroup>
-						<B.FormGroup className='app__form-color-pick-block'>
+						<B.FormGroup>
 							<B.Col sm={12}>
 								<B.ControlLabel>{CONSTANTS[form.type].link}</B.ControlLabel>
 								<B.FormControl
@@ -215,7 +215,7 @@ export default class WarriorForm extends PureComponent {
 									value={form.url}
 								/>
 							</B.Col>
-							<B.Col sm={4} className='app__form-color-pick-block'>
+							<B.Col sm={4}>
 								<B.ControlLabel>
 									{CONSTANTS[form.type].pinColor}
 								</B.ControlLabel>

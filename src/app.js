@@ -13,7 +13,7 @@ import {
 	MapAddForm,
 	Header,
 } from '_blocks';
-import { premissionRequest } from './config/roles';
+import { premissionRequest } from 'config/roles';
 import {
 	ICONSIZE,
 	ICONRESIZESTEP,

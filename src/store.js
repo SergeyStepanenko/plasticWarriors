@@ -1,6 +1,6 @@
 import { createStore, combineReducers, applyMiddleware } from 'redux';
 import { createLogger } from 'redux-logger';
-import main from './reducers/main';
+import * as reducers from './reducers/index';
 
 const convertImmutableToPlain = (state) => {
 	return Object.keys(state).reduce((acc, res) => {
@@ -12,7 +12,7 @@ const convertImmutableToPlain = (state) => {
 };
 
 export default createStore(
-	combineReducers({ main }),
+	combineReducers({ ...reducers }),
 	{},
 	applyMiddleware(
 		createLogger({

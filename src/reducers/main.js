@@ -9,12 +9,6 @@ const initalState = Map({
 	iconSize: ICONSIZE,
 });
 
-export const testAction = () =>
-	({
-		type: 'TEST',
-		payload: 'TEST PAYLOAD'
-	});
-
 export const enlargePinSize = () => ({ type: 'ENLAGE_PIN_SIZE' });
 export const reducePinSize = () => ({ type: 'REDUCE_PIN_SIZE' });
 export const resetPinSize = () => ({ type: 'RESET_PIN_SIZE' });

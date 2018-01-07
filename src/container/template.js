@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/css/bootstrap-theme.css';
 import * as B from 'react-bootstrap';
@@ -15,12 +16,18 @@ import {
 } from '_blocks';
 import { premissionRequest } from 'config/roles';
 import {
-	ICONSIZE,
-	ICONRESIZESTEP,
 	SHIFTYAXIS,
 } from 'constants/index';
 
 export default class App extends PureComponent {
+	static propTypes = {
+		handleFirebaseDataReceival: PropTypes.func.isRequired,
+	}
+
+	static defaultProps = {
+		positionedWarriors: [],
+	}
+
 	state = {
 		authentication: {
 			authenticated: false,
@@ -46,7 +53,6 @@ export default class App extends PureComponent {
 		imgParams: {
 			height: 0,
 		},
-		iconSize: ICONSIZE,
 		expanded: {
 			stats: localStorage.getItem('stats') === 'true',
 			mapForm: localStorage.getItem('mapForm') === 'true',
@@ -104,6 +110,8 @@ export default class App extends PureComponent {
 			}));
 			const imgParams = this.$image.getBoundingClientRect();
 			const map = { ...data.maps[selectedMapId || '-L0AjXER8To8hYfZfuAw'] };
+
+			this.props.handleFirebaseDataReceival({ data, imgParams });
 
 			this.setState({
 				data,
@@ -359,6 +367,7 @@ export default class App extends PureComponent {
 					</div>
 					<Warriors
 						shift={SHIFTYAXIS}
+						// positionedWarriors={this.props.positionedWarriors}
 						positionedWarriors={positionedWarriors}
 						iconSize={iconSize}
 					/>

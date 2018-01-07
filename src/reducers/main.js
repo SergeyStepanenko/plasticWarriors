@@ -1,14 +1,22 @@
-const reducer = (state = '', action) => {
+import { Map } from 'immutable';
+
+const initalState = Map({
+	a: 1,
+});
+
+export const testAction = () =>
+	({
+		type: 'TEST',
+		payload: 'TEST PAYLOAD'
+	});
+
+const main = (state = initalState, action) => {
 	switch (action.type) {
-	case 'DRAG_START':
-		return state = {
-			...state,
-			onDrag: true,
-			activeFigure: action.payload,
-		};
+	case 'TEST':
+		return state.set('b', 2);
 	default:
 		return state;
 	}
 };
 
-export default reducer;
+export default main;

@@ -54,6 +54,7 @@ export default class Header extends PureComponent {
 						<B.Button onClick={signIn} disabled={authenticated}>Войти</B.Button>
 						<B.Button onClick={signOut} disabled={!authenticated}>Выйти</B.Button>
 						<B.Button onClick={refreshData}>Обновить карту</B.Button>
+						<B.Button onClick={this.props.testAction}>Test</B.Button>
 					</B.ButtonGroup>
 				</div>
 			</div>

@@ -1,9 +1,14 @@
 import { createStore, combineReducers, applyMiddleware } from 'redux';
 import { createLogger } from 'redux-logger';
-import reducer from './reducers/main';
+import main from './reducers/main';
 
 export default createStore(
-	combineReducers({ reducer }),
+	combineReducers({ main }),
 	{},
-	applyMiddleware(createLogger())
+	applyMiddleware(
+		createLogger({
+			collapsed: false,
+			stateTransformer: state => ({ ...state.main.toJS() })
+		})
+	)
 );

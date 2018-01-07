@@ -282,25 +282,6 @@ export default class App extends PureComponent {
 		database.ref(`/units/${key}`).remove();
 	}
 
-	resize = (flag) => {
-		const { iconSize } = this.state;
-
-		let size = iconSize;
-
-		switch (flag) {
-		case '+': size += ICONRESIZESTEP;
-			break;
-		case '-': size -= ICONRESIZESTEP;
-			break;
-		default:
-			size = ICONSIZE;
-		}
-
-		this.setState({
-			iconSize: size,
-		});
-	}
-
 	toggleCollapse = (block) => {
 		this.setState(prevState => ({
 			expanded: {
@@ -342,8 +323,11 @@ export default class App extends PureComponent {
 			maps,
 			map,
 			selectedMapId,
-			iconSize,
 		} = this.state;
+
+		const {
+			iconSize,
+		} = this.props;
 
 		const {
 			authenticated,

@@ -16,7 +16,7 @@ export default createStore(
 	{},
 	applyMiddleware(
 		createLogger({
-			collapsed: false,
+			collapsed: true,
 			stateTransformer: state => convertImmutableToPlain(state),
 		})
 	)

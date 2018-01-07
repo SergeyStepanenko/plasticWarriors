@@ -5,7 +5,7 @@ import { createBrowserHistory, createHashHistory } from 'history';
 import registerServiceWorker from './registerServiceWorker';
 import { Provider } from 'react-redux';
 
-import App from './app';
+import App from 'container';
 import { WarriorAddPage } from 'pages';
 import store from './store';
 import './styles.css';

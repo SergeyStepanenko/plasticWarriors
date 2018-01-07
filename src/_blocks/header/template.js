@@ -10,11 +10,14 @@ export default class Header extends PureComponent {
 		selectedMapId: PropTypes.string.isRequired,
 		authenticated: PropTypes.bool.isRequired,
 		maps: PropTypes.object.isRequired,
-		resize: PropTypes.func.isRequired,
 		signIn: PropTypes.func.isRequired,
 		signOut: PropTypes.func.isRequired,
 		refreshData: PropTypes.func.isRequired,
 		handleMapSelect: PropTypes.func.isRequired,
+		// redux
+		enlargePinSize: PropTypes.func.isRequired,
+		reducePinSize: PropTypes.func.isRequired,
+		resetPinSize: PropTypes.func.isRequired,
 	}
 
 	render() {
@@ -22,11 +25,14 @@ export default class Header extends PureComponent {
 			selectedMapId,
 			authenticated,
 			maps,
-			resize,
 			signIn,
 			signOut,
 			refreshData,
 			handleMapSelect,
+			// redux
+			enlargePinSize,
+			reducePinSize,
+			resetPinSize,
 		} = this.props;
 
 		return (
@@ -34,11 +40,11 @@ export default class Header extends PureComponent {
 				<div className='app__header-lable'>
 					Трекер
 					<B.ButtonGroup className='app__header-button-group app__header-buttons'>
-						<B.Button className='app__form-button-long' onClick={() => resize('+')}>+</B.Button>
-						<B.Button onClick={resize}>
+						<B.Button className='app__form-button-long' onClick={enlargePinSize}>+</B.Button>
+						<B.Button onClick={resetPinSize}>
 							<img className='app__header-reset-button' alt='reset' src={resetSVG}></img>
 						</B.Button>
-						<B.Button className='app__form-button-long' onClick={() => resize('-')}>-</B.Button>
+						<B.Button className='app__form-button-long' onClick={reducePinSize}>-</B.Button>
 					</B.ButtonGroup>
 				</div>
 				<B.FormControl
@@ -54,7 +60,6 @@ export default class Header extends PureComponent {
 						<B.Button onClick={signIn} disabled={authenticated}>Войти</B.Button>
 						<B.Button onClick={signOut} disabled={!authenticated}>Выйти</B.Button>
 						<B.Button onClick={refreshData}>Обновить карту</B.Button>
-						<B.Button onClick={this.props.testAction}>Test</B.Button>
 					</B.ButtonGroup>
 				</div>
 			</div>

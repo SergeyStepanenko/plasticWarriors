@@ -364,7 +364,6 @@ export default class App extends PureComponent {
 					selectedMapId={selectedMapId}
 					authenticated={authenticated}
 					maps={maps}
-					resize={this.resize}
 					signIn={this.signIn}
 					signOut={this.signOut}
 					refreshData={this.refreshData}

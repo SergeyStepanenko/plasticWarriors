@@ -22,6 +22,7 @@ import {
 export default class App extends PureComponent {
 	static propTypes = {
 		handleFirebaseDataReceival: PropTypes.func.isRequired,
+		iconSize: PropTypes.string,
 	}
 
 	static defaultProps = {

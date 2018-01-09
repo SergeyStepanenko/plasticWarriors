@@ -11,9 +11,9 @@ import {
 	Warriors,
 	Stats,
 	MapAddForm,
-	Header,
 } from '_blocks';
 import { premissionRequest } from './config/roles';
+import resetSVG from 'assets/icons/spinner.svg';
 import {
 	ICONSIZE,
 	ICONRESIZESTEP,
@@ -36,7 +36,6 @@ export default class App extends PureComponent {
 			east: 0,
 			west: 0,
 		},
-		maps: {},
 		selectedMapId: '',
 		isTrackingDataLoading: true,
 		modal: {
@@ -360,16 +359,33 @@ export default class App extends PureComponent {
 		return (
 			<div className='app'>
 				{modalConditional}
-				<Header
-					selectedMapId={selectedMapId}
-					authenticated={authenticated}
-					maps={maps}
-					resize={this.resize}
-					signIn={this.signIn}
-					signOut={this.signOut}
-					refreshData={this.refreshData}
-					handleMapSelect={this.handleMapSelect}
-				/>
+				<div style={{ height: SHIFTYAXIS }} className='app__header'>
+					<div className='app__header-lable'>
+						Трекер
+						<B.ButtonGroup className='app__header-button-group app__header-buttons'>
+							<B.Button className='app__form-button-long' onClick={() => this.resize('+')}>+</B.Button>
+							<B.Button onClick={this.resize}>
+								<img className='app__header-reset-button' alt='reset' src={resetSVG}></img>
+							</B.Button>
+							<B.Button className='app__form-button-long' onClick={() => this.resize('-')}>-</B.Button>
+						</B.ButtonGroup>
+					</div>
+					<B.FormControl
+						className='app__header-select-map'
+						componentClass='select'
+						value={selectedMapId}
+						onChange={this.handleMapSelect}
+					>
+						<MapsList maps={this.state.maps} selected={selectedMapId} />
+					</B.FormControl>
+					<div className='app__header-buttons'>
+						<B.ButtonGroup>
+							<B.Button onClick={this.signIn} disabled={authenticated}>Войти</B.Button>
+							<B.Button onClick={this.signOut} disabled={!authenticated}>Выйти</B.Button>
+							<B.Button onClick={this.refreshData}>Обновить карту</B.Button>
+						</B.ButtonGroup>
+					</div>
+				</div>
 				<B.Row>
 					<div className='app__map' ref={(r) => { this.$image = r; }}	>
 						<B.Image onLoad={this.calculatePosition} src={map.url} responsive />
@@ -418,3 +434,20 @@ export default class App extends PureComponent {
 		);
 	}
 }
+
+
+const MapsList = ({ maps }) => {
+	if (!maps) {
+		return [];
+	}
+
+	return (
+		Object.keys(maps).map(key => {
+			return (
+				<option key={key} value={key}>
+					{maps[key].name}
+				</option>
+			);
+		})
+	);
+};

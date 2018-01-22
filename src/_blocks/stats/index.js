@@ -30,23 +30,37 @@ export default class Stats extends PureComponent {
 		warriors: {},
 	}
 
-	getMinutesAgo = (milliseconds) => {
+	getMinutesAgo = (milliseconds) => (Date.now() - milliseconds) / 1000 / 60;
+
+	getTimeAgoStatus = (milliseconds) => {
 		if (!milliseconds) {
 			return false;
 		}
 
-		const minutes = (Date.now() - milliseconds) / 1000 / 60;
+		const minutes = this.getMinutesAgo(milliseconds);
 
-		return minutes;
+		if (!minutes) {
+			return NOTAVALIABLE;
+		}
+
+		if (minutes < 1) {
+			return '<1мин';
+		}
+
+		if (minutes > 1440) { // more than 24 hours
+			return '';
+		}
+
+		return `${Math.round(minutes)}мин`;
 	}
 
 	getStatus = ({ isInRange, timeAgo }) => {
-		if (isInRange !== undefined && !isInRange) {
-			return 'Вне карты';
+		if (this.getMinutesAgo(timeAgo) > 5) {
+			return 'Оффлайн';
 		}
 
-		if (timeAgo > 5) {
-			return 'Оффлайн';
+		if (isInRange !== undefined && !isInRange) {
+			return 'Вне карты';
 		}
 	}
 
@@ -84,11 +98,10 @@ export default class Stats extends PureComponent {
 								{
 									positionedWarriors.map((warrior) => {
 										const redPanelClassName = 'app__panel-red';
-										const timeAgo = this.getMinutesAgo(warrior.time);
+										const timeAgo = this.getTimeAgoStatus(warrior.time);
 										const accuracy = warrior.acc ? `${warrior.acc}m` : NOTAVALIABLE;
 										const batteryLevel = warrior.batteryLvl ? `${warrior.batteryLvl}%` : NOTAVALIABLE;
-										const timeAgoString = timeAgo ? (timeAgo > 1 ? `${Math.round(timeAgo)}мин` : '<1мин') : NOTAVALIABLE;
-										const status = this.getStatus({ isInRange: warrior.isInRange, timeAgo });
+										const status = this.getStatus({ isInRange: warrior.isInRange, timeAgo: warrior.time });
 										const style = {
 											batteryLevel: warrior.batteryLvl < 33 ? redPanelClassName : '',
 											accuracy: warrior.acc > 25 ? redPanelClassName : '',
@@ -109,7 +122,7 @@ export default class Stats extends PureComponent {
 														{warrior.name || NOTAVALIABLE}
 													</a>
 												</td>
-												<td className={style.timeAgo}>{timeAgoString}</td>
+												<td className={style.timeAgo}>{timeAgo}</td>
 												<td className={style.batteryLevel}>{batteryLevel}</td>
 												<td className={style.accuracy}>{accuracy}</td>
 												<td className='app__panel-status'>{status}</td>
